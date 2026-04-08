@@ -621,6 +621,11 @@ input.disq-other:focus{border-color:var(--red)}
       <option value="">— Week —</option>
     </select>
     <div class="bulk-sep"></div>
+    <span class="bulk-lbl">Untag week:</span>
+    <select class="bulk-sel" id="avBulkUntagWeek" onchange="avBulkUntag()">
+      <option value="">— Week —</option>
+    </select>
+    <div class="bulk-sep"></div>
     <button class="btn btn-sm btn-teal" onclick="avExportIds()">📋 Export IDs</button>
     <button class="btn btn-sm btn-bulk btn-bulk-exit" onclick="avClearSel()">✕ Deselect all</button>
   </div>
@@ -1819,6 +1824,11 @@ function populateAvFilters(){
   if(bw.options.length<=1&&bfw){
     [...bfw.options].slice(2).forEach(o=>{const n=o.cloneNode(true);bw.appendChild(n);});
   }
+  // Bulk untag week select
+  const buw=document.getElementById('avBulkUntagWeek');
+  if(buw&&buw.options.length<=1&&bfw){
+    [...bfw.options].slice(2).forEach(o=>{const n=o.cloneNode(true);buw.appendChild(n);});
+  }
 }
 function avSort(col){
   if(avSortCol===col)avSortDir*=-1;
@@ -1931,7 +1941,7 @@ function renderAccountsView(){
       <td class="av-muted">${r.owner||'—'}</td>
       <td>${ct?`<span class="av-contacts-pill">👤 ${ct}</span>`:'<span class="av-muted">—</span>'}</td>
       <td><span class="av-badge ${stageCls}">${stageLbl}</span></td>
-      <td>${weekTagsRow.length?weekTagsRow.map(w=>`<span class="av-week" style="margin-right:2px">${weekLabel(w)}</span>`).join(''):'<span class="av-muted">—</span>'}</td>
+      <td>${weekTagsRow.length>1?`<div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${weekTagsRow.map(w=>`<span class="av-week">${weekLabel(w)}</span>`).join('')}<span style="font-size:9px;color:var(--muted);font-weight:600;margin-left:2px">(${weekTagsRow.length})</span></div>`:weekTagsRow.length===1?`<span class="av-week">${weekLabel(weekTagsRow[0])}</span>`:'<span class="av-muted">—</span>'}</td>
       <td><div class="av-note-preview" title="${lastNote}">${lastNote||'<span class="av-muted">—</span>'}</div></td>
     </tr>`;
   }).join('');
@@ -1961,6 +1971,8 @@ function updateAvBulkBar(){
   bar.classList.toggle('open',cnt>0);
   document.getElementById('avBulkStage').value='';
   document.getElementById('avBulkWeek').value='';
+  const untagSel=document.getElementById('avBulkUntagWeek');
+  if(untagSel)untagSel.value='';
 }
 function avClearSel(){avSelected.clear();updateAvBulkBar();renderAccountsView();}
 function avBulkMove(){
@@ -1982,6 +1994,19 @@ function avBulkTag(){
     S[id].weekTags=[...tags].sort();
   });
   saveS(S);avClearSel();renderAccountsView();showToast('Week tag applied ✓');
+}
+function avBulkUntag(){
+  const week=document.getElementById('avBulkUntagWeek').value;if(!week)return;
+  let count=0;
+  avSelected.forEach(id=>{
+    if(S[id]?.weekTags?.includes(week)){
+      S[id].weekTags=S[id].weekTags.filter(w=>w!==week);
+      if(S[id].weekTags.length===0)delete S[id].weekTags;
+      count++;
+    }
+  });
+  saveS(S);avClearSel();renderAccountsView();
+  showToast(count>0?`Removed week tag from ${count} account${count!==1?'s':''} ✓`:'No accounts had that week tag');
 }
 function avExportIds(){
   if(avSelected.size===0){showToast('No accounts selected');return;}
