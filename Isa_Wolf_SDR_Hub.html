@@ -885,7 +885,7 @@ input.disq-other:focus{border-color:var(--red)}
     <input class="disq-other" id="disqOther" placeholder="Describe reason…" oninput="updateDisqBtn()">
     <div class="disq-acts">
       <button class="btn btn-ghost btn-sm" onclick="cancelDisq()">Cancel</button>
-      <button class="btn btn-danger btn-sm" id="disqBtn" onclick="confirmDisq()" disabled>Disqualify</button>
+      <button type="button" class="btn btn-danger btn-sm" id="disqBtn" onclick="event.stopPropagation();confirmDisq();" disabled>Disqualify</button>
     </div>
   </div>
 </div>
@@ -957,6 +957,31 @@ const COLS=[
 function loadS(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch{return{}}}
 function saveS(s){localStorage.setItem(LS,JSON.stringify(s))}
 let S=loadS();
+
+// ── Pre-tag March 30 week accounts ─────────────────────────────────
+(function initMarch30Tags(){
+  const march30Week = '2026-03-30';
+  const accountsToTag = [
+    '0010O00001wxTh6QAE','0010O00001wxn3FQAQ','0010O00001wxnx1QAA','0010O00001wxsOnQAI',
+    '0010O00001wy2xsQAA','0010O00001wy8BTQAY','0010O00001wyP5CQAU','0010O00001wyP5vQAE',
+    '0010O00001wyVhUQAU','0010O00001wyoGmQAI','0010O00001wyop5QAA','0010O00001wypYdQAI',
+    '0010O00001wysI8QAI','0010O00001wzLrtQAE','0010O00001wzS0vQAE','0010O00001wyV1ZQAU',
+    '0010O00001wyXvnQAE','0010O00001wycG6QAI','0010O00001yZTMOQA4','0010O00001wyV21QAE',
+    '0010O00001wy3MXQAY','0013Y00002ZtoAfQAJ','0010O00001yZ4dNQAS','0010O00001wxppuQAA',
+    '0010O00001wxrunQAA','0010O00001wya5WQAQ','0010O00001wycHCQAY','0013Y00002ZztjWQAR',
+    '0010O00001wxpnSQAQ','0010O00001wyrLcQAI'
+  ];
+  
+  accountsToTag.forEach(id => {
+    if (!S[id]) S[id] = {};
+    if (!S[id].weekTags) S[id].weekTags = [];
+    if (!S[id].weekTags.includes(march30Week)) {
+      S[id].weekTags.push(march30Week);
+    }
+  });
+  
+  saveS(S);
+})();
 
 // ── Stage logic ─────────────────────────────────────────────────────
 function autoStage(r){
@@ -1266,13 +1291,19 @@ function pickReason(el){
 }
 function updateDisqBtn(){document.getElementById('disqBtn').disabled=!document.getElementById('disqOther').value.trim();}
 function confirmDisq(){
-  if(!pendingDisqId||!selReason)return;
+  console.log('confirmDisq called', {pendingDisqId, selReason});
+  if(!pendingDisqId){console.error('No pendingDisqId');return;}
+  if(!selReason){console.error('No selReason');return;}
   S[pendingDisqId]=S[pendingDisqId]||{};
   S[pendingDisqId].stage='disq';
   S[pendingDisqId].disqReason=selReason;
   S[pendingDisqId].disqDate=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  saveS(S);document.getElementById('disqOverlay').classList.remove('open');pendingDisqId=null;selReason=null;
-  render();showToast('Account disqualified');
+  saveS(S);
+  document.getElementById('disqOverlay').classList.remove('open');
+  pendingDisqId=null;
+  selReason=null;
+  render();
+  showToast('Account disqualified');
 }
 function cancelDisq(){document.getElementById('disqOverlay').classList.remove('open');pendingDisqId=null;}
 
