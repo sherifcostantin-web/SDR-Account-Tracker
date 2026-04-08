@@ -620,6 +620,8 @@ input.disq-other:focus{border-color:var(--red)}
     <select class="bulk-sel" id="avBulkWeek" onchange="avBulkTag()">
       <option value="">— Week —</option>
     </select>
+    <div class="bulk-sep"></div>
+    <button class="btn btn-sm btn-teal" onclick="avExportIds()">📋 Export IDs</button>
     <button class="btn btn-sm btn-bulk btn-bulk-exit" onclick="avClearSel()">✕ Deselect all</button>
   </div>
   <div class="av-table-wrap">
@@ -958,10 +960,13 @@ function loadS(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch{ret
 function saveS(s){localStorage.setItem(LS,JSON.stringify(s))}
 let S=loadS();
 
-// ── Pre-tag March 30 week accounts ─────────────────────────────────
-(function initMarch30Tags(){
+// ── One-time cleanup: Remove March 30 tags (runs once only) ────────
+(function cleanupMarch30Tags(){
+  const cleanupKey = 'march30_cleanup_done';
+  if (localStorage.getItem(cleanupKey)) return; // Already ran
+  
   const march30Week = '2026-03-30';
-  const accountsToTag = [
+  const accountsToClean = [
     '0010O00001wxTh6QAE','0010O00001wxn3FQAQ','0010O00001wxnx1QAA','0010O00001wxsOnQAI',
     '0010O00001wy2xsQAA','0010O00001wy8BTQAY','0010O00001wyP5CQAU','0010O00001wyP5vQAE',
     '0010O00001wyVhUQAU','0010O00001wyoGmQAI','0010O00001wyop5QAA','0010O00001wypYdQAI',
@@ -972,15 +977,15 @@ let S=loadS();
     '0010O00001wxpnSQAQ','0010O00001wyrLcQAI'
   ];
   
-  accountsToTag.forEach(id => {
-    if (!S[id]) S[id] = {};
-    if (!S[id].weekTags) S[id].weekTags = [];
-    if (!S[id].weekTags.includes(march30Week)) {
-      S[id].weekTags.push(march30Week);
+  accountsToClean.forEach(id => {
+    if (S[id]?.weekTags?.includes(march30Week)) {
+      S[id].weekTags = S[id].weekTags.filter(w => w !== march30Week);
+      if (S[id].weekTags.length === 0) delete S[id].weekTags;
     }
   });
   
   saveS(S);
+  localStorage.setItem(cleanupKey, 'true'); // Mark cleanup as done
 })();
 
 // ── Stage logic ─────────────────────────────────────────────────────
@@ -1437,8 +1442,8 @@ function pushNote(id,text){
 function delNote(idx){if(!curId)return;(S[curId].notes||[]).splice(idx,1);saveS(S);renderNotes(curId);render();}
 function stageFromModal(col){
   if(!curId)return;
-  if(col==='disq'){closeDetail();pendingDisqId=curId;openDisqModal(ALL.find(r=>r.id===curId)?.name||'');}
-  else if(col==='nurture'){closeDetail();pendingNurtureId=curId;openNurtureModal(ALL.find(r=>r.id===curId)?.name||'');}
+  if(col==='disq'){pendingDisqId=curId;closeDetail();openDisqModal(ALL.find(r=>r.id===pendingDisqId)?.name||'');}
+  else if(col==='nurture'){pendingNurtureId=curId;closeDetail();openNurtureModal(ALL.find(r=>r.id===pendingNurtureId)?.name||'');}
   else{applyStage(curId,col);openDetail(curId);}
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');curId=null;}
@@ -1977,6 +1982,29 @@ function avBulkTag(){
     S[id].weekTags=[...tags].sort();
   });
   saveS(S);avClearSel();renderAccountsView();showToast('Week tag applied ✓');
+}
+function avExportIds(){
+  if(avSelected.size===0){showToast('No accounts selected');return;}
+  const ids = Array.from(avSelected).join(', ');
+  
+  // Use the reliable fallback method that works everywhere
+  const el = document.createElement('textarea');
+  el.value = ids;
+  el.style.position = 'fixed';
+  el.style.left = '-9999px';
+  document.body.appendChild(el);
+  el.select();
+  el.setSelectionRange(0, 99999); // For mobile
+  
+  try{
+    document.execCommand('copy');
+    showToast(`Copied ${avSelected.size} account ID${avSelected.size!==1?'s':''} ✓`);
+  }catch(e){
+    console.error('Copy failed:', e);
+    showToast('Copy failed - please select and copy manually');
+  }
+  
+  document.body.removeChild(el);
 }
 function clearAvFilters(){
   ['avSearch','avStage','avWeek','avCountry','avType','avCustType','avOwner','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal','avStarsSelect'].forEach(id=>{
