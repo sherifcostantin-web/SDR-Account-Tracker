@@ -200,6 +200,8 @@ select.bulk-sel{padding:4px 22px 4px 8px;border:none;border-radius:var(--r-sm);f
 .d-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px}
 .d-lbl{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:2px}
 .d-val{font-size:12px;font-weight:600;color:var(--h)}
+.inline-edit-btn{background:none;border:none;padding:2px 5px;cursor:pointer;font-size:11px;opacity:.5;transition:opacity .15s}
+.inline-edit-btn:hover{opacity:1;background:var(--hover)}
 .stage-row{display:flex;flex-wrap:wrap;gap:6px}
 .stg-btn{padding:5px 13px;border:1.5px solid var(--border-mid);border-radius:var(--r-full);font-size:12px;font-weight:500;cursor:pointer;background:#fff;font-family:var(--font);transition:all .15s}
 .stg-btn:hover{border-color:var(--blue);color:var(--blue)}
@@ -380,6 +382,9 @@ input.disq-other:focus{border-color:var(--red)}
 .av-hdr-cb{width:14px;height:14px;accent-color:var(--blue);cursor:pointer}
 .av-count{font-size:11px;color:var(--muted);white-space:nowrap}
 .compact-filter{display:flex;align-items:center}
+.star-chip{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-full);padding:3px 8px;font-size:10px;font-weight:600;color:var(--body);cursor:pointer;transition:all .15s;font-family:var(--font)}
+.star-chip:hover{border-color:var(--yellow-text);background:var(--yellow-bg);color:var(--yellow-text)}
+.star-chip.active{border-color:var(--yellow-text);background:var(--yellow-bg);color:var(--yellow-text);box-shadow:0 0 0 2px rgba(151,79,12,.15)}
 .compact-flt-sel{padding:5px 8px;border:1px solid var(--border-mid);border-radius:var(--r-sm);font-family:var(--font);font-size:12px;background:#fff;color:var(--body);cursor:pointer;outline:none;white-space:nowrap}
 .compact-flt-sel:focus{border-color:#F97316}
 .rooms-filter{display:flex;align-items:center;gap:4px}
@@ -445,6 +450,7 @@ input.disq-other:focus{border-color:var(--red)}
       <button class="view-tab" id="vTabTasks" onclick="setView('tasks')">✅ Tasks</button>
     </div>
     <div style="width:1px;height:20px;background:rgba(255,255,255,.30)"></div>
+    <button class="btn btn-ghost btn-sm" onclick="openAddAccountForm()" title="Add a new account manually">➕ Add Account</button>
     <button class="btn btn-ghost btn-sm" onclick="importBackup()" title="Restore notes, tags and stages from a backup file">📂 Import</button>
     <button class="btn btn-ghost btn-sm" onclick="exportBackup()" title="Save all notes, tags and stages to a file">💾 Export</button>
     <button class="btn btn-ghost btn-sm" onclick="confirmReset()">↺ Reset</button>
@@ -563,22 +569,24 @@ input.disq-other:focus{border-color:var(--red)}
     <select class="flt" id="avOwner" onchange="renderAccountsView()">
       <option value="">All account owners</option>
     </select>
+    <select class="flt" id="avSource" onchange="renderAccountsView()">
+      <option value="">All sources</option>
+      <option value="salesforce">📊 Salesforce</option>
+      <option value="custom">✏️ Custom (manual)</option>
+    </select>
     <select class="flt" id="avContacts" onchange="renderAccountsView()">
       <option value="">All contacts</option>
       <option value="has">👤 Has contacts</option>
       <option value="none">No contacts</option>
     </select>
-    <div class="compact-filter" style="margin-left:4px">
-      <select class="flt compact-flt-sel" id="avStarsSelect" onchange="avStarsFromSelect()" title="Filter by star rating">
-        <option value="">★ All stars</option>
-        <option value="5">5★ only</option>
-        <option value="4">4★ only</option>
-        <option value="3">3★ only</option>
-        <option value="2">2★ only</option>
-        <option value="1">1★ only</option>
-        <option value="0">Unrated</option>
-        <option value="multi">Multiple…</option>
-      </select>
+    <div class="compact-filter" style="display:flex;gap:4px;align-items:center;margin-left:4px">
+      <span style="font-size:11px;color:var(--muted);font-weight:500">Stars:</span>
+      <button class="star-chip" data-stars="5" onclick="avToggleStar(5)" title="5-star hotels">5★</button>
+      <button class="star-chip" data-stars="4" onclick="avToggleStar(4)" title="4-star hotels">4★</button>
+      <button class="star-chip" data-stars="3" onclick="avToggleStar(3)" title="3-star hotels">3★</button>
+      <button class="star-chip" data-stars="2" onclick="avToggleStar(2)" title="2-star hotels">2★</button>
+      <button class="star-chip" data-stars="1" onclick="avToggleStar(1)" title="1-star hotels">1★</button>
+      <button class="star-chip" data-stars="0" onclick="avToggleStar(0)" title="Unrated hotels">0★</button>
     </div>
     <div class="compact-filter rooms-compact" style="margin-left:4px">
       <select class="rooms-op compact-flt-sel" id="avRoomsOp" onchange="renderAccountsView()" style="border-right:none;border-radius:var(--r-sm) 0 0 var(--r-sm)">
@@ -627,6 +635,7 @@ input.disq-other:focus{border-color:var(--red)}
     </select>
     <div class="bulk-sep"></div>
     <button class="btn btn-sm btn-teal" onclick="avExportIds()">📋 Export IDs</button>
+    <button class="btn btn-sm btn-ghost" onclick="avExportCustomIds()">✏️ Export Custom IDs</button>
     <button class="btn btn-sm btn-bulk btn-bulk-exit" onclick="avClearSel()">✕ Deselect all</button>
   </div>
   <div class="av-table-wrap">
@@ -913,6 +922,41 @@ input.disq-other:focus{border-color:var(--red)}
     <div class="nurture-acts">
       <button class="btn btn-ghost btn-sm" onclick="cancelNurture()">Cancel</button>
       <button class="btn btn-teal btn-sm" id="nurtureBtn" onclick="confirmNurture()" disabled>Move to Nurture</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Account modal -->
+<div class="overlay" id="addAccountOverlay" onclick="maybeCloseAddAccount(event)" style="z-index:1100">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-title">Add New Account</div>
+      <button class="modal-x" onclick="closeAddAccountForm()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-bg);border:1px solid var(--blue-text);border-radius:var(--r-md);padding:10px 12px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--blue-text);font-weight:600;margin-bottom:4px">ℹ️ About Manual Accounts</div>
+        <div style="font-size:10px;color:var(--blue-text);line-height:1.4">
+          This creates a basic account entry you can work with immediately. Salesforce data (PMS, contacts, etc.) will be blank until Sherif enriches it. Required: Account Name + Account ID.
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--h);margin-bottom:4px">Account Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="addAccName" placeholder="e.g., Hotel Paradise Amsterdam" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r-md);font-family:var(--font);font-size:13px">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--h);margin-bottom:4px">Account ID (Salesforce) <span style="color:var(--red)">*</span></label>
+        <input type="text" id="addAccId" placeholder="e.g., 0010O00001wxTh6QAE" maxlength="18" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r-md);font-family:var(--font);font-size:13px;font-family:monospace">
+        <div id="addAccIdError" style="display:none;font-size:10px;color:var(--red);margin-top:3px"></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--h);margin-bottom:4px">Country (optional)</label>
+        <input type="text" id="addAccCountry" placeholder="e.g., Netherlands" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r-md);font-family:var(--font);font-size:13px">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeAddAccountForm()">Cancel</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="saveNewAccount()">➕ Add Account</button>
     </div>
   </div>
 </div>
@@ -1342,13 +1386,117 @@ function confirmNurture(){
 }
 function cancelNurture(){document.getElementById('nurtureOverlay').classList.remove('open');pendingNurtureId=null;}
 
+// ── Add Account ──────────────────────────────────────────────────────
+const CUSTOM_ACCOUNTS_KEY='sdr_hub_custom_accounts';
+function loadCustomAccounts(){try{return JSON.parse(localStorage.getItem(CUSTOM_ACCOUNTS_KEY)||'[]')}catch{return[]}}
+function saveCustomAccounts(arr){localStorage.setItem(CUSTOM_ACCOUNTS_KEY,JSON.stringify(arr))}
+
+function openAddAccountForm(){
+  document.getElementById('addAccName').value='';
+  document.getElementById('addAccId').value='';
+  document.getElementById('addAccCountry').value='';
+  document.getElementById('addAccIdError').style.display='none';
+  document.getElementById('addAccountOverlay').classList.add('open');
+}
+function closeAddAccountForm(){
+  document.getElementById('addAccountOverlay').classList.remove('open');
+}
+function maybeCloseAddAccount(e){
+  if(e.target===document.getElementById('addAccountOverlay'))closeAddAccountForm();
+}
+function saveNewAccount(){
+  const name=document.getElementById('addAccName').value.trim();
+  const id=document.getElementById('addAccId').value.trim();
+  const country=document.getElementById('addAccCountry').value.trim();
+  const errorEl=document.getElementById('addAccIdError');
+  
+  // Validate required fields
+  if(!name||!id){
+    errorEl.textContent='Account Name and ID are required';
+    errorEl.style.display='block';
+    return;
+  }
+  
+  // Validate Account ID format (15 or 18 chars, alphanumeric)
+  if(!(id.length===15||id.length===18)||!/^[a-zA-Z0-9]+$/.test(id)){
+    errorEl.textContent='Account ID must be 15 or 18 alphanumeric characters';
+    errorEl.style.display='block';
+    return;
+  }
+  
+  // Check if ID already exists
+  if(ALL.find(r=>r.id===id)){
+    errorEl.textContent='This account ID already exists in your tracker';
+    errorEl.style.display='block';
+    return;
+  }
+  
+  const customAccounts=loadCustomAccounts();
+  if(customAccounts.find(r=>r.id===id)){
+    errorEl.textContent='This account ID already exists in your custom accounts';
+    errorEl.style.display='block';
+    return;
+  }
+  
+  // Create minimal account object
+  const newAccount={
+    id:id,
+    name:name,
+    status:'Suspect',
+    recordType:'Hotel',
+    country:country||'',
+    city:'',
+    stars:0,
+    rooms:0,
+    accType:'',
+    owner:'Isa Wolf',
+    lastActivity:null,
+    pms:'',
+    rms:'',
+    cm:'',
+    arr:null,
+    openOpps:0,
+    wonOpps:0,
+    phone:'',
+    website:'',
+    sdrLastActivity:null,
+    sdrDemoBooked:false,
+    hasOpenOpp:false,
+    customerType:'Independent',
+    bookingEngine:'',
+    businessCustType:'',
+    thnMarketManager:'',
+    baseRate:null,
+    contacts:[],
+    isCustom:true // Flag to identify manual accounts
+  };
+  
+  customAccounts.push(newAccount);
+  saveCustomAccounts(customAccounts);
+  
+  // Add to ALL array
+  ALL.push(newAccount);
+  
+  closeAddAccountForm();
+  render();
+  // Auto-open the new account detail
+  setTimeout(()=>openDetail(id),100);
+  showToast(`Added "${name}" to your tracker ✓`);
+}
+
 // ── Detail modal ──────────────────────────────────────────────────────
 let curId=null;
 function openDetail(id){
   curId=id;
   const r=ALL.find(x=>x.id===id);if(!r)return;
   const acc=S[id]||{};const stage=getStage(r);
+  const isCustom=r.isCustom||false;
+  
+  // Title with custom badge
   document.getElementById('mTitle').textContent=r.name;
+  if(isCustom){
+    document.getElementById('mTitle').innerHTML=r.name+' <span style="font-size:10px;background:var(--purple-bg);color:var(--purple-text);padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:600">✏️ CUSTOM</span>';
+  }
   document.getElementById('mSfLink').href=SF+id;
   let meta=[];
   if(r.recordType)meta.push(r.recordType);
@@ -1358,16 +1506,24 @@ function openDetail(id){
   const webVal=r.website
     ?`<a href="${r.website}" target="_blank" style="color:var(--blue);text-decoration:none;word-break:break-all" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.website.replace(/^https?:\/\//,'').replace(/\/$/,'')}</a>`
     :'—';
+  
+  // Helper to create editable field
+  const editBtn=(field)=>isCustom?` <button class="inline-edit-btn" onclick="editCustomField('${id}','${field}')" title="Edit">✏️</button>`:'';
+  
   document.getElementById('mDetails').innerHTML=[
     ['Account ID',`<span style="font-family:monospace;font-size:11px;color:var(--muted)">${r.id}</span>`],
-    ['Record Type',r.recordType||'—'],['Customer Type',r.customerType||'—'],
+    ['Record Type',(r.recordType||'—')+editBtn('recordType')],
+    ['Customer Type',(r.customerType||'—')+editBtn('customerType')],
     ...(r.businessCustType?[['Business Type',r.businessCustType]]:[]),
-    ['Country',r.country||'—'],['Stars',r.stars>0?starsStr(r.stars)+' ('+r.stars+')':'Unrated'],
-    ['Rooms',r.rooms||'—'],['Base Rate (USD)',r.baseRate?'$'+r.baseRate.toLocaleString():'—'],['PMS',r.pms||'—'],
-    ['Booking Engine',r.bookingEngine||'—'],
-    ['Website',webVal],
-    ['Account Owner',r.owner||'—'],
-    ['THN Market Manager',r.thnMarketManager||'—'],
+    ['Country',(r.country||'—')+editBtn('country')],
+    ['Stars',(r.stars>0?starsStr(r.stars)+' ('+r.stars+')':'Unrated')+editBtn('stars')],
+    ['Rooms',(r.rooms||'—')+editBtn('rooms')],
+    ['Base Rate (USD)',(r.baseRate?'$'+r.baseRate.toLocaleString():'—')+editBtn('baseRate')],
+    ['PMS',(r.pms||'—')+editBtn('pms')],
+    ['Booking Engine',(r.bookingEngine||'—')+editBtn('bookingEngine')],
+    ['Website',webVal+(isCustom?editBtn('website'):'')],
+    ['Account Owner',(r.owner||'—')+editBtn('owner')],
+    ['THN Market Manager',(r.thnMarketManager||'—')+editBtn('thnMarketManager')],
     ['Open Opp',r.hasOpenOpp?'Yes':'No'],
     ...(acc.disqReason?[['Disqualified',acc.disqReason+(acc.disqDate?' · '+acc.disqDate:'')]]:[]),
     ...(acc.nurtureReason?[['Nurture reason',acc.nurtureReason+(acc.nurtureDate?' · '+acc.nurtureDate:'')]]:[]),
@@ -1453,6 +1609,55 @@ function stageFromModal(col){
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');curId=null;}
 function maybeClose(e){if(e.target===document.getElementById('detailOverlay'))closeDetail();}
+
+// ── Edit Custom Account Fields ────────────────────────────────────────
+function editCustomField(id,field){
+  const r=ALL.find(x=>x.id===id);
+  if(!r||!r.isCustom){showToast('Only custom accounts can be edited');return;}
+  
+  const fieldLabels={
+    recordType:'Record Type',customerType:'Customer Type',country:'Country',
+    stars:'Stars (0-5)',rooms:'Room Count',baseRate:'Base Rate (USD)',
+    pms:'PMS',bookingEngine:'Booking Engine',website:'Website URL',
+    owner:'Account Owner',thnMarketManager:'THN Market Manager'
+  };
+  
+  const currentVal=r[field]||'';
+  let newVal=prompt(`Edit ${fieldLabels[field]}:`,currentVal);
+  
+  if(newVal===null)return; // Cancelled
+  newVal=newVal.trim();
+  
+  // Type-specific validation
+  if(field==='stars'){
+    const num=parseInt(newVal);
+    if(isNaN(num)||num<0||num>5){showToast('Stars must be 0-5');return;}
+    newVal=num;
+  }else if(field==='rooms'){
+    const num=parseInt(newVal);
+    if(newVal&&isNaN(num)){showToast('Rooms must be a number');return;}
+    newVal=num||0;
+  }else if(field==='baseRate'){
+    const num=parseFloat(newVal);
+    if(newVal&&isNaN(num)){showToast('Base rate must be a number');return;}
+    newVal=num||null;
+  }
+  
+  // Update the account in ALL array
+  r[field]=newVal||'';
+  
+  // Update localStorage
+  const customAccounts=loadCustomAccounts();
+  const idx=customAccounts.findIndex(a=>a.id===id);
+  if(idx>=0){
+    customAccounts[idx][field]=newVal||'';
+    saveCustomAccounts(customAccounts);
+  }
+  
+  // Refresh detail view
+  openDetail(id);
+  showToast(`Updated ${fieldLabels[field]} ✓`);
+}
 
 // ── Contacts ─────────────────────────────────────────────────────────
 const CSTATUS={
@@ -1787,11 +1992,14 @@ function setView(v){
 
 // ── Accounts table view ──────────────────────────────────────────────
 let avSortCol='name',avSortDir=1,avSelected=new Set(),avStarsFilter=new Set();
-function avStarsFromSelect(){
-  avStarsFilter.clear();
-  const val=document.getElementById('avStarsSelect').value;
-  if(val===''||val==='multi'){}  // multi is a placeholder; single values handled below
-  else{avStarsFilter.add(parseInt(val));}
+function avToggleStar(n){
+  if(avStarsFilter.has(n))avStarsFilter.delete(n);
+  else avStarsFilter.add(n);
+  // Update chip visuals
+  document.querySelectorAll('.star-chip').forEach(chip=>{
+    const chipVal=parseInt(chip.dataset.stars);
+    chip.classList.toggle('active',avStarsFilter.has(chipVal));
+  });
   renderAccountsView();
 }
 function populateAvFilters(){
@@ -1855,6 +2063,7 @@ function getAvFiltered(){
   const type=document.getElementById('avType').value;
   const custType=document.getElementById('avCustType').value;
   const owner=document.getElementById('avOwner').value;
+  const source=document.getElementById('avSource').value;
   const contacts=document.getElementById('avContacts').value;
   const roomsOp=document.getElementById('avRoomsOp').value;
   const roomsVal=parseInt(document.getElementById('avRoomsVal').value||'');
@@ -1871,11 +2080,13 @@ function getAvFiltered(){
     if(type&&r.recordType!==type)return false;
     if(custType&&avCustTypeDisplay(r)!==custType)return false;
     if(owner&&r.owner!==owner)return false;
+    if(source==='custom'&&!r.isCustom)return false;
+    if(source==='salesforce'&&r.isCustom)return false;
     if(contacts==='has'&&!getContacts(r.id).length)return false;
     if(contacts==='none'&&getContacts(r.id).length)return false;
     if(week==='untagged'){if(getWeekTags(r.id).length>0)return false;}
     else if(week){if(!getWeekTags(r.id).includes(week))return false;}
-    if(avStarsFilter.size>0&&!avStarsFilter.has(r.stars||0))return false;
+    if(avStarsFilter.size>0&&!avStarsFilter.has(parseInt(r.stars)||0))return false;
     if(roomsOp&&!isNaN(roomsVal)){
       const rv=r.rooms||0;
       if(roomsOp==='eq'&&rv!==roomsVal)return false;
@@ -2031,11 +2242,36 @@ function avExportIds(){
   
   document.body.removeChild(el);
 }
+function avExportCustomIds(){
+  const customAccounts=ALL.filter(r=>r.isCustom);
+  if(customAccounts.length===0){showToast('No custom accounts found');return;}
+  const ids=customAccounts.map(r=>r.id).join(', ');
+  
+  const el=document.createElement('textarea');
+  el.value=ids;
+  el.style.position='fixed';
+  el.style.left='-9999px';
+  document.body.appendChild(el);
+  el.select();
+  el.setSelectionRange(0,99999);
+  
+  try{
+    document.execCommand('copy');
+    showToast(`Copied ${customAccounts.length} custom account ID${customAccounts.length!==1?'s':''} ✓`);
+  }catch(e){
+    console.error('Copy failed:',e);
+    showToast('Copy failed - please select and copy manually');
+  }
+  
+  document.body.removeChild(el);
+}
 function clearAvFilters(){
-  ['avSearch','avStage','avWeek','avCountry','avType','avCustType','avOwner','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal','avStarsSelect'].forEach(id=>{
+  ['avSearch','avStage','avWeek','avCountry','avType','avCustType','avOwner','avSource','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
   avStarsFilter.clear();
+  // Clear star chip visuals
+  document.querySelectorAll('.star-chip').forEach(chip=>chip.classList.remove('active'));
   renderAccountsView();
 }
 
@@ -2379,6 +2615,12 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cance
     o2.value=w;o2.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);
     bwSel.appendChild(o2);
   });
+  // Load and merge custom accounts from localStorage
+  const customAccounts=loadCustomAccounts();
+  if(customAccounts.length>0){
+    customAccounts.forEach(acc=>ALL.push(acc));
+    console.log('Loaded '+customAccounts.length+' custom account(s) from localStorage');
+  }
   render();
 })();
 </script>
