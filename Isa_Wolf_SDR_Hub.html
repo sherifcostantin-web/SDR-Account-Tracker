@@ -60,7 +60,6 @@ body{font-family:var(--font);background:var(--page);color:var(--body);font-size:
 .search-input:focus{border-color:#F97316}
 select.flt{padding:5px 24px 5px 8px;border:1px solid var(--border-mid);border-radius:var(--r-sm);font-family:var(--font);font-size:12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%2352647A'/%3E%3C/svg%3E") no-repeat right 8px center;appearance:none;color:var(--body);cursor:pointer;outline:none}
 select.flt:focus{border-color:#F97316}
-select.flt.week-active{border-color:var(--teal);background-color:#F0FDFF;color:var(--teal)}
 .flt-count{font-size:11px;color:var(--muted)}
 .clear-link{font-size:11px;color:#F97316;cursor:pointer;text-decoration:underline;white-space:nowrap;margin-left:auto}
 
@@ -382,9 +381,26 @@ input.disq-other:focus{border-color:var(--red)}
 .av-hdr-cb{width:14px;height:14px;accent-color:var(--blue);cursor:pointer}
 .av-count{font-size:11px;color:var(--muted);white-space:nowrap}
 .compact-filter{display:flex;align-items:center}
-.star-chip{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-full);padding:3px 8px;font-size:10px;font-weight:600;color:var(--body);cursor:pointer;transition:all .15s;font-family:var(--font)}
-.star-chip:hover{border-color:var(--yellow-text);background:var(--yellow-bg);color:var(--yellow-text)}
-.star-chip.active{border-color:var(--yellow-text);background:var(--yellow-bg);color:var(--yellow-text);box-shadow:0 0 0 2px rgba(151,79,12,.15)}
+/* ── Multi-select dropdowns ── */
+.ms-wrap{position:relative;display:inline-block}
+.ms-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1.5px solid var(--border-mid);border-radius:var(--r-sm);background:#fff;font-size:12px;font-weight:500;color:var(--body);cursor:pointer;font-family:var(--font);white-space:nowrap;min-width:110px;outline:none}
+.ms-btn:hover{border-color:var(--blue-text)}
+.ms-btn.active{border-color:var(--blue);background:var(--blue-bg);color:var(--blue-text)}
+.ms-caret{margin-left:auto;font-size:8px;color:var(--muted);flex-shrink:0}
+.ms-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:190px;max-width:260px;background:#fff;border:1.5px solid var(--border);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:600;padding:4px 0;max-height:240px;overflow-y:auto;display:none}
+.ms-panel.open{display:block}
+.ms-item{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:12px;color:var(--body);cursor:pointer;user-select:none;line-height:1.3}
+.ms-item:hover{background:var(--page)}
+.ms-item input[type=checkbox]{accent-color:var(--blue);width:13px;height:13px;cursor:pointer;flex-shrink:0;margin:0}
+.ms-divider{height:1px;background:var(--border);margin:3px 0}
+.ms-clear{display:block;width:100%;padding:6px 12px;font-size:11px;color:var(--blue-text);background:none;border:none;border-top:1px solid var(--border);cursor:pointer;text-align:left;font-family:var(--font);font-weight:500}
+.ms-select-all-header{display:flex;align-items:center;justify-content:space-between;padding:5px 12px 5px 12px;border-bottom:1px solid var(--border);background:#fafafa;position:sticky;top:0;z-index:1}
+.ms-select-all,.ms-clear-all{font-size:11px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:3px}
+.ms-select-all{color:var(--blue-text)}
+.ms-select-all:hover{background:var(--blue-bg)}
+.ms-clear-all{color:var(--muted)}
+.ms-clear-all:hover{background:var(--page);color:var(--body)}
+.ms-clear:hover{background:var(--page)}
 .compact-flt-sel{padding:5px 8px;border:1px solid var(--border-mid);border-radius:var(--r-sm);font-family:var(--font);font-size:12px;background:#fff;color:var(--body);cursor:pointer;outline:none;white-space:nowrap}
 .compact-flt-sel:focus{border-color:#F97316}
 .rooms-filter{display:flex;align-items:center;gap:4px}
@@ -466,33 +482,12 @@ input.disq-other:focus{border-color:var(--red)}
     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input class="search-input" id="search" placeholder="Search name, ID, or paste multiple IDs separated by commas…" oninput="render()">
   </div>
-  <select class="flt" id="fWeek" onchange="onWeekFilterChange()">
-    <option value="">All weeks</option>
-    <option value="untagged">Untagged only</option>
-  </select>
-  <select class="flt" id="fCountry" onchange="render()"><option value="">All countries</option></select>
-  <select class="flt" id="fType" onchange="render()">
-    <option value="">All types</option>
-    <option value="Hotel">🏨 Hotel</option>
-    <option value="Chain">🔗 Chain</option>
-    <option value="Business">🏢 Business</option>
-  </select>
-  <select class="flt" id="fStars" onchange="render()">
-    <option value="">All stars</option>
-    <option value="5">⭐⭐⭐⭐⭐ 5-star</option>
-    <option value="4">⭐⭐⭐⭐ 4-star</option>
-    <option value="3">⭐⭐⭐ 3-star</option>
-    <option value="0">Unrated</option>
-  </select>
-  <select class="flt" id="fCustType" onchange="render()">
-    <option value="">All customer types</option>
-    <option value="Independent">Independent</option>
-    <option value="Group">Group</option>
-    <option value="Global Chain">Global Chain</option>
-    <option value="Local Chain">Local Chain</option>
-    <option value="Business">Business</option>
-  </select>
-  <select class="flt" id="fAE" onchange="render()"><option value="">All AEs</option></select>
+  <div class="ms-wrap" id="fWeek"></div>
+  <div class="ms-wrap" id="fCountry"></div>
+  <div class="ms-wrap" id="fType"></div>
+  <div class="ms-wrap" id="fStars"></div>
+  <div class="ms-wrap" id="fCustType"></div>
+  <div class="ms-wrap" id="fAE"></div>
   <select class="flt" id="fContacts" onchange="render()">
     <option value="">All contacts</option>
     <option value="has">👤 Has contacts</option>
@@ -543,32 +538,12 @@ input.disq-other:focus{border-color:var(--red)}
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input class="search-input" id="avSearch" placeholder="Search name, ID, or paste multiple IDs (comma-separated)…" oninput="renderAccountsView()">
     </div>
-    <select class="flt" id="avStage" onchange="renderAccountsView()">
-      <option value="">All stages</option>
-      <option value="untouched">Untouched</option>
-      <option value="chase">Still need to chase</option>
-      <option value="email">Email sent</option>
-      <option value="demo">Demo booked</option>
-      <option value="nurture">Nurture</option>
-      <option value="disq">Disqualified</option>
-    </select>
-    <select class="flt" id="avWeek" onchange="renderAccountsView()">
-      <option value="">All weeks</option>
-      <option value="untagged">Untagged only</option>
-    </select>
-    <select class="flt" id="avCountry" onchange="renderAccountsView()"><option value="">All countries</option></select>
-    <select class="flt" id="avType" onchange="renderAccountsView()">
-      <option value="">All types</option>
-      <option value="Hotel">🏨 Hotel</option>
-      <option value="Chain">🔗 Chain</option>
-      <option value="Business">🏢 Business</option>
-    </select>
-    <select class="flt" id="avCustType" onchange="renderAccountsView()">
-      <option value="">All customer types</option>
-    </select>
-    <select class="flt" id="avOwner" onchange="renderAccountsView()">
-      <option value="">All account owners</option>
-    </select>
+    <div class="ms-wrap" id="avStage"></div>
+    <div class="ms-wrap" id="avWeek"></div>
+    <div class="ms-wrap" id="avCountry"></div>
+    <div class="ms-wrap" id="avType"></div>
+    <div class="ms-wrap" id="avCustType"></div>
+    <div class="ms-wrap" id="avOwner"></div>
     <select class="flt" id="avSource" onchange="renderAccountsView()">
       <option value="">All sources</option>
       <option value="salesforce">📊 Salesforce</option>
@@ -579,15 +554,7 @@ input.disq-other:focus{border-color:var(--red)}
       <option value="has">👤 Has contacts</option>
       <option value="none">No contacts</option>
     </select>
-    <div class="compact-filter" style="display:flex;gap:4px;align-items:center;margin-left:4px">
-      <span style="font-size:11px;color:var(--muted);font-weight:500">Stars:</span>
-      <button class="star-chip" data-stars="5" onclick="avToggleStar(5)" title="5-star hotels">5★</button>
-      <button class="star-chip" data-stars="4" onclick="avToggleStar(4)" title="4-star hotels">4★</button>
-      <button class="star-chip" data-stars="3" onclick="avToggleStar(3)" title="3-star hotels">3★</button>
-      <button class="star-chip" data-stars="2" onclick="avToggleStar(2)" title="2-star hotels">2★</button>
-      <button class="star-chip" data-stars="1" onclick="avToggleStar(1)" title="1-star hotels">1★</button>
-      <button class="star-chip" data-stars="0" onclick="avToggleStar(0)" title="Unrated hotels">0★</button>
-    </div>
+    <div class="ms-wrap" id="avStars"></div>
     <div class="compact-filter rooms-compact" style="margin-left:4px">
       <select class="rooms-op compact-flt-sel" id="avRoomsOp" onchange="renderAccountsView()" style="border-right:none;border-radius:var(--r-sm) 0 0 var(--r-sm)">
         <option value="">Rooms: Any</option>
@@ -1069,12 +1036,12 @@ function getWeekTagCount(weekIso){return ALL.filter(r=>getWeekTags(r.id).include
 // ── Filters ─────────────────────────────────────────────────────────
 function getFilters(){return{
   q:document.getElementById('search').value.toLowerCase().trim(),
-  week:document.getElementById('fWeek').value,
-  country:document.getElementById('fCountry').value,
-  type:document.getElementById('fType').value,
-  stars:document.getElementById('fStars').value,
-  custType:document.getElementById('fCustType').value,
-  ae:document.getElementById('fAE').value,
+  week:msGet('fWeek'),
+  country:msGet('fCountry'),
+  type:msGet('fType'),
+  stars:msGet('fStars'),
+  custType:msGet('fCustType'),
+  ae:msGet('fAE'),
   contacts:document.getElementById('fContacts').value,
 };}
 
@@ -1084,16 +1051,19 @@ function applyFilters(arr,f){return arr.filter(r=>{
     if(qTerms.length>1){if(!qTerms.some(t=>r.id.toLowerCase()===t.toLowerCase()))return false;}
     else{if(!r.name.toLowerCase().includes(f.q)&&!r.id.toLowerCase().includes(f.q))return false;}
   }
-  if(f.country&&r.country!==f.country)return false;
-  if(f.type&&r.recordType!==f.type)return false;
-  if(f.ae&&r.owner!==f.ae)return false;
-  if(f.custType&&r.customerType!==f.custType)return false;
-  if(f.stars){
-    if(f.stars==='0'&&r.stars>0)return false;
-    if(f.stars!=='0'&&r.stars!==parseInt(f.stars))return false;
+  if(f.country.size>0&&!f.country.has(r.country||''))return false;
+  if(f.type.size>0&&!f.type.has(r.recordType||''))return false;
+  if(f.ae.size>0&&!f.ae.has(r.owner||''))return false;
+  if(f.custType.size>0&&!f.custType.has(r.customerType||''))return false;
+  if(f.stars.size>0&&!f.stars.has(String(parseInt(r.stars)||0)))return false;
+  if(f.week.size>0){
+    const tags=getWeekTags(r.id);
+    const hasUntagged=f.week.has('untagged');
+    const specificWeeks=[...f.week].filter(w=>w!=='untagged');
+    if(hasUntagged&&specificWeeks.length>0){if(tags.length>0&&!specificWeeks.some(w=>tags.includes(w)))return false;}
+    else if(hasUntagged){if(tags.length>0)return false;}
+    else{if(!specificWeeks.some(w=>tags.includes(w)))return false;}
   }
-  if(f.week==='untagged'&&getWeekTags(r.id).length>0)return false;
-  if(f.week&&f.week!=='untagged'&&!getWeekTags(r.id).includes(f.week))return false;
   if(f.contacts){const ct=getContacts(r.id).length;if(f.contacts==='has'&&ct===0)return false;if(f.contacts==='none'&&ct>0)return false;}
   return true;
 });}
@@ -1130,11 +1100,7 @@ function renderWeekStats(weekIso){
 }
 
 // ── Week filter change ──────────────────────────────────────────────
-function onWeekFilterChange(){
-  const fWeek=document.getElementById('fWeek');
-  fWeek.classList.toggle('week-active',!!fWeek.value&&fWeek.value!=='untagged');
-  render();
-}
+// onWeekFilterChange replaced by ms onChange
 
 // ── Badge helpers ───────────────────────────────────────────────────
 function rtBadge(rt){
@@ -1273,7 +1239,7 @@ function render(){
   if(currentView==='tasks'){renderTasksView();return;}
   const f=getFilters();
   const base=applyFilters(ALL,f);
-  renderWeekStats(f.week&&f.week!=='untagged'?f.week:null);
+  {const _sw=[...f.week].filter(w=>w!=='untagged');renderWeekStats(_sw.length===1?_sw[0]:null);}
   document.getElementById('fltCount').textContent=`${base.length} of ${ALL.length} accounts`;
 
   const filtered=base;
@@ -1991,51 +1957,148 @@ function setView(v){
 }
 
 // ── Accounts table view ──────────────────────────────────────────────
-let avSortCol='name',avSortDir=1,avSelected=new Set(),avStarsFilter=new Set();
-function avToggleStar(n){
-  if(avStarsFilter.has(n))avStarsFilter.delete(n);
-  else avStarsFilter.add(n);
-  // Update chip visuals
-  document.querySelectorAll('.star-chip').forEach(chip=>{
-    const chipVal=parseInt(chip.dataset.stars);
-    chip.classList.toggle('active',avStarsFilter.has(chipVal));
+let avSortCol='name',avSortDir=1,avSelected=new Set();
+// ── Multi-select filter engine ────────────────────────────────────────
+const MS={};
+function msInit(id,options,placeholder,onChangeFn){
+  const onChange=onChangeFn||renderAccountsView;
+  const wrap=document.getElementById(id);
+  if(!wrap)return;
+  if(!MS[id])MS[id]=new Set();
+  // Don't re-render if already built and options haven't changed
+  if(wrap.dataset.msBuilt==='1'&&wrap.dataset.msCount===String(options.length))return;
+  wrap.dataset.msBuilt='1';
+  wrap.dataset.msCount=String(options.length);
+  const prevSel=new Set(MS[id]);
+  wrap.innerHTML='';
+  const btn=document.createElement('button');
+  btn.className='ms-btn'+(prevSel.size>0?' active':'');
+  btn.type='button';
+  btn.innerHTML=`<span class="ms-label">${placeholder}</span><span class="ms-caret">▾</span>`;
+  const panel=document.createElement('div');
+  panel.className='ms-panel';
+  // Sticky Select All / Clear header
+  const hdr=document.createElement('div');
+  hdr.className='ms-select-all-header';
+  const selAll=document.createElement('button');
+  selAll.type='button';selAll.className='ms-select-all';selAll.textContent='Select all';
+  selAll.addEventListener('click',e=>{
+    e.stopPropagation();
+    panel.querySelectorAll('input[type=checkbox]').forEach(cb=>{MS[id].add(cb.value);cb.checked=true;});
+    msLabel(id,placeholder);
+    btn.classList.toggle('active',MS[id].size>0);
+    onChange();
   });
-  renderAccountsView();
+  const clrAll=document.createElement('button');
+  clrAll.type='button';clrAll.className='ms-clear-all';clrAll.textContent='Clear';
+  clrAll.addEventListener('click',e=>{
+    e.stopPropagation();
+    msClearInner(id,placeholder,panel,btn);
+    onChange();
+  });
+  hdr.appendChild(selAll);
+  hdr.appendChild(clrAll);
+  panel.appendChild(hdr);
+  options.forEach(({value,label})=>{
+    const li=document.createElement('label');
+    li.className='ms-item';
+    const cb=document.createElement('input');
+    cb.type='checkbox';
+    cb.value=value;
+    cb.checked=prevSel.has(value);
+    cb.addEventListener('change',()=>{
+      if(cb.checked)MS[id].add(value);else MS[id].delete(value);
+      msLabel(id,placeholder);
+      btn.classList.toggle('active',MS[id].size>0);
+      onChange();
+    });
+    li.appendChild(cb);
+    li.appendChild(document.createTextNode(label));
+    panel.appendChild(li);
+  });
+  panel.addEventListener('click',e=>e.stopPropagation());
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const wasOpen=panel.classList.contains('open');
+    document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
+    if(!wasOpen)panel.classList.add('open');
+  });
+  wrap.appendChild(btn);
+  wrap.appendChild(panel);
+  msLabel(id,placeholder);
 }
+function msLabel(id,placeholder){
+  const wrap=document.getElementById(id);if(!wrap)return;
+  const lbl=wrap.querySelector('.ms-label');if(!lbl)return;
+  const s=MS[id]||new Set();
+  if(s.size===0)lbl.textContent=placeholder;
+  else if(s.size===1)lbl.textContent=[...s][0].length>18?[...s][0].slice(0,16)+'…':[...s][0];
+  else lbl.textContent=s.size+' selected';
+}
+function msClearInner(id,placeholder,panel,btn){
+  MS[id]=new Set();
+  if(panel)panel.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  if(btn)btn.classList.remove('active');
+  msLabel(id,placeholder);
+}
+function msClear(id,placeholder){
+  if(!MS[id])return;
+  const wrap=document.getElementById(id);
+  const panel=wrap?wrap.querySelector('.ms-panel'):null;
+  const btn=wrap?wrap.querySelector('.ms-btn'):null;
+  msClearInner(id,placeholder,panel,btn);
+}
+function msGet(id){return MS[id]||new Set();}
+// Close panels on outside click
+document.addEventListener('click',()=>{
+  document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
+});
 function populateAvFilters(){
-  // Countries
-  const co=document.getElementById('avCountry');
-  if(co.options.length<=1){
-    const cs=[...new Set(ALL.map(r=>r.country).filter(Boolean))].sort();
-    cs.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;co.appendChild(o);});
-  }
-  // Customer types (dynamic — includes businessCustType values)
-  const ct=document.getElementById('avCustType');
-  if(ct.options.length<=1){
-    const types=[...new Set(ALL.map(r=>avCustTypeDisplay(r)).filter(Boolean))].sort();
-    types.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;ct.appendChild(o);});
-  }
-  // Account owners
-  const ow=document.getElementById('avOwner');
-  if(ow.options.length<=1){
-    const owners=[...new Set(ALL.map(r=>r.owner).filter(Boolean))].sort();
-    owners.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;ow.appendChild(o);});
-  }
-  // Weeks
-  const fw=document.getElementById('avWeek');
-  const bfw=document.getElementById('fWeek'); // copy from board filter
-  if(fw.options.length<=2&&bfw){
-    [...bfw.options].slice(2).forEach(o=>{const n=o.cloneNode(true);fw.appendChild(n);});
-  }
-  // Bulk week select
+  // Stage (static)
+  msInit('avStage',[
+    {value:'untouched',label:'⬜ Untouched'},
+    {value:'chase',label:'🔁 Still need to chase'},
+    {value:'email',label:'✉️ Email sent'},
+    {value:'demo',label:'📅 Demo booked'},
+    {value:'nurture',label:'🌱 Nurture'},
+    {value:'disq',label:'🚫 Disqualified'},
+  ],'All stages');
+  // Type (static)
+  msInit('avType',[
+    {value:'Hotel',label:'🏨 Hotel'},
+    {value:'Chain',label:'🔗 Chain'},
+    {value:'Business',label:'🏢 Business'},
+  ],'All types');
+  // Countries (dynamic)
+  const cs=[...new Set(ALL.map(r=>r.country).filter(Boolean))].sort();
+  msInit('avCountry',cs.map(c=>({value:c,label:c})),'All countries');
+  // Customer types (dynamic)
+  const types=[...new Set(ALL.map(r=>avCustTypeDisplay(r)).filter(Boolean))].sort();
+  msInit('avCustType',types.map(t=>({value:t,label:t})),'All customer types');
+  // Account owners (dynamic)
+  const owners=[...new Set(ALL.map(r=>r.owner).filter(Boolean))].sort();
+  msInit('avOwner',owners.map(x=>({value:x,label:x})),'All owners');
+  // Stars (static)
+  msInit('avStars',[
+    {value:'5',label:'★★★★★  5-star'},
+    {value:'4',label:'★★★★  4-star'},
+    {value:'3',label:'★★★  3-star'},
+    {value:'2',label:'★★  2-star'},
+    {value:'1',label:'★  1-star'},
+    {value:'0',label:'☆  Unrated'},
+  ],'All stars');
+  // Weeks (built from WEEKS array — same source as board filter)
+  const avWkOpts=[{value:'untagged',label:'📭 Untagged only'}];
+  WEEKS.forEach(w=>avWkOpts.push({value:w,label:'📅 '+weekLabel(w)+' – '+weekEndLabel(w)}));
+  msInit('avWeek',avWkOpts,'All weeks');
+  // Bulk week selects (unchanged native selects)
   const bw=document.getElementById('avBulkWeek');
-  if(bw.options.length<=1&&bfw){
-    [...bfw.options].slice(2).forEach(o=>{const n=o.cloneNode(true);bw.appendChild(n);});
+  if(bw&&bw.options.length<=1){
+    WEEKS.forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);bw.appendChild(o);});
   }
-  // Bulk untag week select
   const buw=document.getElementById('avBulkUntagWeek');
-  if(buw&&buw.options.length<=1&&bfw){
-    [...bfw.options].slice(2).forEach(o=>{const n=o.cloneNode(true);buw.appendChild(n);});
+  if(buw&&buw.options.length<=1){
+    WEEKS.forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);buw.appendChild(o);});
   }
 }
 function avSort(col){
@@ -2057,12 +2120,6 @@ function avCustTypeDisplay(r){
 }
 function getAvFiltered(){
   const q=(document.getElementById('avSearch').value||'').toLowerCase();
-  const stage=document.getElementById('avStage').value;
-  const week=document.getElementById('avWeek').value;
-  const country=document.getElementById('avCountry').value;
-  const type=document.getElementById('avType').value;
-  const custType=document.getElementById('avCustType').value;
-  const owner=document.getElementById('avOwner').value;
   const source=document.getElementById('avSource').value;
   const contacts=document.getElementById('avContacts').value;
   const roomsOp=document.getElementById('avRoomsOp').value;
@@ -2075,18 +2132,25 @@ function getAvFiltered(){
       if(qTerms.length>1){if(!qTerms.some(t=>(r.id||'').toLowerCase()===t.toLowerCase()))return false;}
       else{if(!r.name.toLowerCase().includes(q)&&!(r.id||'').toLowerCase().includes(q))return false;}
     }
-    if(stage&&getStage(r)!==stage)return false;
-    if(country&&r.country!==country)return false;
-    if(type&&r.recordType!==type)return false;
-    if(custType&&avCustTypeDisplay(r)!==custType)return false;
-    if(owner&&r.owner!==owner)return false;
+    const _stage=msGet('avStage');if(_stage.size>0&&!_stage.has(getStage(r)))return false;
+    const _country=msGet('avCountry');if(_country.size>0&&!_country.has(r.country||''))return false;
+    const _type=msGet('avType');if(_type.size>0&&!_type.has(r.recordType||''))return false;
+    const _ct=msGet('avCustType');if(_ct.size>0&&!_ct.has(avCustTypeDisplay(r)))return false;
+    const _owner=msGet('avOwner');if(_owner.size>0&&!_owner.has(r.owner||''))return false;
     if(source==='custom'&&!r.isCustom)return false;
     if(source==='salesforce'&&r.isCustom)return false;
     if(contacts==='has'&&!getContacts(r.id).length)return false;
     if(contacts==='none'&&getContacts(r.id).length)return false;
-    if(week==='untagged'){if(getWeekTags(r.id).length>0)return false;}
-    else if(week){if(!getWeekTags(r.id).includes(week))return false;}
-    if(avStarsFilter.size>0&&!avStarsFilter.has(parseInt(r.stars)||0))return false;
+    const _week=msGet('avWeek');
+    if(_week.size>0){
+      const tags=getWeekTags(r.id);
+      const hasUntagged=_week.has('untagged');
+      const specificWeeks=[..._week].filter(w=>w!=='untagged');
+      if(hasUntagged&&specificWeeks.length>0){if(tags.length>0&&!specificWeeks.some(w=>tags.includes(w)))return false;}
+      else if(hasUntagged){if(tags.length>0)return false;}
+      else{if(!specificWeeks.some(w=>tags.includes(w)))return false;}
+    }
+    const _stars=msGet('avStars');if(_stars.size>0&&!_stars.has(String(parseInt(r.stars)||0)))return false;
     if(roomsOp&&!isNaN(roomsVal)){
       const rv=r.rooms||0;
       if(roomsOp==='eq'&&rv!==roomsVal)return false;
@@ -2266,12 +2330,12 @@ function avExportCustomIds(){
   document.body.removeChild(el);
 }
 function clearAvFilters(){
-  ['avSearch','avStage','avWeek','avCountry','avType','avCustType','avOwner','avSource','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal'].forEach(id=>{
+  ['avStage','avWeek','avCountry','avType','avCustType','avOwner','avStars'].forEach(id=>{
+    msClear(id,{avStage:'All stages',avWeek:'All weeks',avCountry:'All countries',avType:'All types',avCustType:'All customer types',avOwner:'All owners',avStars:'All stars'}[id]);
+  });
+  ['avSearch','avSource','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
-  avStarsFilter.clear();
-  // Clear star chip visuals
-  document.querySelectorAll('.star-chip').forEach(chip=>chip.classList.remove('active'));
   renderAccountsView();
 }
 
@@ -2549,8 +2613,11 @@ function confirmReset(){
   saveS(S);render();showToast('Stages + tags reset ✓');
 }
 function clearFilters(){
-  ['search','fWeek','fCountry','fType','fStars','fCustType','fAE','fContacts'].forEach(id=>{document.getElementById(id).value='';});
-  document.getElementById('fWeek').classList.remove('week-active');
+  ['fWeek','fCountry','fType','fStars','fCustType','fAE'].forEach(id=>{
+    msClear(id,{fWeek:'All weeks',fCountry:'All countries',fType:'All types',fStars:'All stars',fCustType:'All customer types',fAE:'All AEs'}[id]);
+  });
+  document.getElementById('search').value='';
+  const fc=document.getElementById('fContacts');if(fc)fc.value='';
   render();
 }
 
@@ -2600,21 +2667,24 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cance
 
 // ── Init dropdowns ────────────────────────────────────────────────────
 (function(){
+  // Board view multi-select filters
   const countries=[...new Set(ALL.map(r=>r.country).filter(Boolean))].sort();
   const aes=[...new Set(ALL.map(r=>r.owner).filter(Boolean))].sort();
-  const c=document.getElementById('fCountry'),a=document.getElementById('fAE');
-  countries.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;c.appendChild(o);});
-  aes.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;a.appendChild(o);});
-  const wSel=document.getElementById('fWeek');
+  msInit('fCountry',countries.map(x=>({value:x,label:x})),'All countries',render);
+  msInit('fAE',aes.map(x=>({value:x,label:x})),'All AEs',render);
+  msInit('fType',[{value:'Hotel',label:'🏨 Hotel'},{value:'Chain',label:'🔗 Chain'},{value:'Business',label:'🏢 Business'}],'All types',render);
+  msInit('fStars',[{value:'5',label:'★★★★★  5-star'},{value:'4',label:'★★★★  4-star'},{value:'3',label:'★★★  3-star'},{value:'0',label:'☆  Unrated'}],'All stars',render);
+  msInit('fCustType',[{value:'Independent',label:'Independent'},{value:'Group',label:'Group'},{value:'Global Chain',label:'Global Chain'},{value:'Local Chain',label:'Local Chain'},{value:'Business',label:'Business'}],'All customer types',render);
+  // Week filter for board (built from WEEKS array)
+  const weekOpts=[{value:'untagged',label:'📭 Untagged only'}];
   const bwSel=document.getElementById('bulkWeek');
   WEEKS.forEach(w=>{
-    const o=document.createElement('option');
-    o.value=w;o.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);
-    wSel.appendChild(o);
+    weekOpts.push({value:w,label:'📅 '+weekLabel(w)+' – '+weekEndLabel(w)});
     const o2=document.createElement('option');
     o2.value=w;o2.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);
     bwSel.appendChild(o2);
   });
+  msInit('fWeek',weekOpts,'All weeks',render);
   // Load and merge custom accounts from localStorage
   const customAccounts=loadCustomAccounts();
   if(customAccounts.length>0){
