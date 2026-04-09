@@ -201,6 +201,9 @@ select.bulk-sel{padding:4px 22px 4px 8px;border:none;border-radius:var(--r-sm);f
 .d-val{font-size:12px;font-weight:600;color:var(--h)}
 .inline-edit-btn{background:none;border:none;padding:2px 5px;cursor:pointer;font-size:11px;opacity:.5;transition:opacity .15s}
 .inline-edit-btn:hover{opacity:1;background:var(--hover)}
+.ef-val{}
+.ef-edited{font-size:10px;color:var(--blue-text);font-weight:600;margin-left:4px}
+.inline-edit-input{border:1.5px solid var(--blue);border-radius:4px;padding:2px 7px;font-size:12px;font-family:var(--font);width:160px;outline:none;color:var(--body)}
 .stage-row{display:flex;flex-wrap:wrap;gap:6px}
 .stg-btn{padding:5px 13px;border:1.5px solid var(--border-mid);border-radius:var(--r-full);font-size:12px;font-weight:500;cursor:pointer;background:#fff;font-family:var(--font);transition:all .15s}
 .stg-btn:hover{border-color:var(--blue);color:var(--blue)}
@@ -1132,7 +1135,7 @@ function cardHTML(r){
     if(r.businessCustType)badges+=`<span class="badge b-bct">${r.businessCustType}</span>`;
   }
   if(r.country)badges+=`<span class="badge b-country">${r.country}</span>`;
-  if(r.bookingEngine)badges+=`<span class="badge b-be" title="Booking Engine">🔖 ${r.bookingEngine}</span>`;
+  const _be=getAccProp(r,'bookingEngine');if(_be)badges+=`<span class="badge b-be" title="Booking Engine">🔖 ${_be}</span>`;
   weekTags.forEach(w=>{badges+=`<span class="badge b-week">📅 ${weekLabel(w)}</span>`;});
   const sfCtCount=(r.contacts||[]).length;
   const manCtCount=((S[r.id]||{}).manualContacts||[]).length;
@@ -1452,6 +1455,29 @@ function saveNewAccount(){
 
 // ── Detail modal ──────────────────────────────────────────────────────
 let curId=null;
+function fEditField(id,field,val){
+  const isEdited=(S[id]||{})[field]!==undefined;
+  const display=val||'—';
+  return`<span class="ef-val" id="ef-${id}-${field}">${display}</span>`
+    +`<button class="inline-edit-btn" onclick="startEditField('${id}','${field}')" title="Edit ${field}">✏️</button>`
+    +(isEdited?'<span class="ef-edited">edited</span>':'');
+}
+function startEditField(id,field){
+  const r=ALL.find(x=>x.id===id);if(!r)return;
+  const cur=(S[id]||{})[field]!==undefined?(S[id]||{})[field]:(r[field]||'');
+  const span=document.getElementById('ef-'+id+'-'+field);if(!span)return;
+  const inp=document.createElement('input');
+  inp.type='text';inp.value=cur;inp.className='inline-edit-input';
+  const save=()=>{
+    const v=inp.value.trim();
+    S[id]=S[id]||{};
+    if(v){S[id][field]=v;}else{delete S[id][field];}
+    saveS(S);openDetail(id);render();
+  };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}if(e.key==='Escape'){openDetail(id);}});
+  span.replaceWith(inp);inp.focus();inp.select();
+}
 function openDetail(id){
   curId=id;
   const r=ALL.find(x=>x.id===id);if(!r)return;
@@ -1485,8 +1511,8 @@ function openDetail(id){
     ['Stars',(r.stars>0?starsStr(r.stars)+' ('+r.stars+')':'Unrated')+editBtn('stars')],
     ['Rooms',(r.rooms||'—')+editBtn('rooms')],
     ['Base Rate (USD)',(r.baseRate?'$'+r.baseRate.toLocaleString():'—')+editBtn('baseRate')],
-    ['PMS',(r.pms||'—')+editBtn('pms')],
-    ['Booking Engine',(r.bookingEngine||'—')+editBtn('bookingEngine')],
+    ['PMS',fEditField(id,'pms',getAccProp(r,'pms'))],
+    ['Booking Engine',fEditField(id,'bookingEngine',getAccProp(r,'bookingEngine'))],
     ['Website',webVal+(isCustom?editBtn('website'):'')],
     ['Account Owner',(r.owner||'—')+editBtn('owner')],
     ['THN Market Manager',(r.thnMarketManager||'—')+editBtn('thnMarketManager')],
@@ -1960,6 +1986,8 @@ function setView(v){
 let avSortCol='name',avSortDir=1,avSelected=new Set();
 // ── Multi-select filter engine ────────────────────────────────────────
 const MS={};
+// Returns S-override if set, otherwise falls back to ALL data (for editable fields)
+function getAccProp(r,field){const ov=(S[r.id]||{})[field];return ov!==undefined?ov:r[field];}
 function msInit(id,options,placeholder,onChangeFn){
   const onChange=onChangeFn||renderAccountsView;
   const wrap=document.getElementById(id);
