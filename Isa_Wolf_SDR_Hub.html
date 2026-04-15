@@ -206,6 +206,37 @@ select.bulk-sel{padding:4px 22px 4px 8px;border:none;border-radius:var(--r-sm);f
 .city-search-wrap{padding:4px 6px 2px;border-bottom:1px solid var(--border)}
 .city-search{width:100%;padding:4px 7px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--font);outline:none;color:var(--body);background:var(--surface)}
 .city-search:focus{border-color:var(--blue)}
+.b-plan{background:#f3e8ff;color:#7c3aed;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;display:inline-block;margin-top:2px}
+.wp-plan-section{border-top:1px solid var(--border);margin-top:6px;padding-top:6px}
+.wp-plan-title{font-size:10px;font-weight:600;color:var(--muted);padding:2px 6px 4px;text-transform:uppercase;letter-spacing:.5px}
+.wp-plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:0 4px 2px}
+.wp-plan-btn{padding:5px 6px;border-radius:var(--r-sm);border:1.5px solid var(--border-mid);font-size:10px;font-weight:600;font-family:var(--font);cursor:pointer;background:#fff;color:var(--body);text-align:center;transition:all .12s}
+.wp-plan-btn:hover{border-color:#7c3aed;color:#7c3aed;background:#f3e8ff}
+.wp-plan-btn.wp-plan-sel{border-color:#7c3aed;background:#f3e8ff;color:#7c3aed}
+.wp-plan-clear{width:100%;margin-top:2px;padding:4px;border:none;background:none;color:var(--muted);font-size:10px;cursor:pointer;font-family:var(--font)}
+.wp-plan-clear:hover{color:var(--red)}
+.bwm-wrap{position:relative;display:inline-block}
+.bwm-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border-mid);border-radius:var(--r-md);box-shadow:var(--shadow2);z-index:300;min-width:230px;padding:4px 0 0}
+.bwm-panel.open{display:block}
+.bwm-item{display:flex;align-items:center;gap:8px;padding:4px 10px;cursor:pointer;font-size:11px;font-family:var(--font);color:var(--body)}
+.bwm-item:hover{background:var(--hover)}
+.bwm-item input[type=checkbox]{cursor:pointer;accent-color:var(--blue)}
+.bwm-footer{border-top:1px solid var(--border);padding:5px 8px 6px;display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.bwm-add{background:var(--blue);color:#fff;border:none;padding:4px 9px;border-radius:var(--r-sm);font-size:11px;font-family:var(--font);cursor:pointer;font-weight:600}
+.bwm-add:hover{opacity:.88}
+.bwm-remove{background:#fff7ed;color:#c2410c;border:1px solid #c2410c;padding:4px 9px;border-radius:var(--r-sm);font-size:11px;font-family:var(--font);cursor:pointer;font-weight:600}
+.bwm-remove:hover{opacity:.88}
+.bwm-clearall{background:none;color:var(--muted);border:none;padding:4px 6px;font-size:11px;font-family:var(--font);cursor:pointer}
+.bwm-clearall:hover{color:var(--red)}
+.av-sel-th{position:relative;white-space:nowrap}
+.smart-sel-arrow{background:none;border:none;cursor:pointer;padding:0 2px;color:var(--muted);font-size:10px;line-height:1;vertical-align:middle}
+.smart-sel-arrow:hover{color:var(--body)}
+.smart-sel-panel{display:none;position:absolute;top:calc(100% + 2px);left:0;background:#fff;border:1px solid var(--border-mid);border-radius:var(--r-md);box-shadow:var(--shadow2);z-index:350;padding:8px 10px;min-width:200px}
+.smart-sel-panel.open{display:block}
+.ss-row{display:flex;align-items:center;gap:6px;padding:3px 0}
+.ss-lbl{font-size:11px;color:var(--body);white-space:nowrap;min-width:85px}
+.ss-inp{width:52px !important;padding:3px 5px}
+.ss-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:3px 8px;font-size:11px;font-family:var(--font);cursor:pointer;font-weight:600}.ss-btn:hover{opacity:.88}
 .ef-edited{font-size:10px;color:var(--blue-text);font-weight:600;margin-left:4px}
 .inline-edit-input{border:1.5px solid var(--blue);border-radius:4px;padding:2px 7px;font-size:12px;font-family:var(--font);width:160px;outline:none;color:var(--body)}
 .stage-row{display:flex;flex-wrap:wrap;gap:6px}
@@ -495,6 +526,7 @@ input.disq-other:focus{border-color:var(--red)}
   <div class="ms-wrap" id="fStars"></div>
   <div class="ms-wrap" id="fCustType"></div>
   <div class="ms-wrap" id="fAE"></div>
+  <div class="ms-wrap" id="fBatch"></div>
   <select class="flt" id="fContacts" onchange="render()">
     <option value="">All contacts</option>
     <option value="has">👤 Has contacts</option>
@@ -520,9 +552,20 @@ input.disq-other:focus{border-color:var(--red)}
     <option value="disq">🚫 Disqualified</option>
   </select>
   <div class="bulk-sep"></div>
-  <span class="bulk-lbl">Tag week:</span>
-  <select class="bulk-sel" id="bulkWeek" onchange="bulkTagWeek()">
-    <option value="">— Week —</option>
+  <span class="bulk-lbl">Weeks:</span>
+  <div class="bwm-wrap" id="bwmBoard">
+    <button class="bulk-sel bwm-btn" type="button" onclick="toggleBwm(event,'bwmBoard')">Select weeks ▾</button>
+    <div class="bwm-panel"></div>
+  </div>
+  <div class="bulk-sep"></div>
+  <span class="bulk-lbl">Tag plan:</span>
+  <select class="bulk-sel" id="bulkPlanSel" onchange="bulkTagPlan()">
+    <option value="">— Plan —</option>
+    <option value="Pricing Plan">💵 Pricing Plan</option>
+    <option value="Direct Plan">💻 Direct Plan</option>
+    <option value="Performance Plan">📈 Performance Plan</option>
+    <option value="Connect AI">🤖 Connect AI</option>
+    <option value="__clear">✕ Clear plan</option>
   </select>
   <div class="bulk-sep"></div>
   <button class="btn btn-sm btn-bulk" onclick="bulkSelectAll()">Select all visible</button>
@@ -553,6 +596,7 @@ input.disq-other:focus{border-color:var(--red)}
     <div class="ms-wrap" id="avCustType"></div>
     <div class="ms-wrap" id="avOwner"></div>
     <div class="ms-wrap" id="avBatch"></div>
+    <div class="ms-wrap" id="avPlan"></div>
     <select class="flt" id="avSource" onchange="renderAccountsView()">
       <option value="">All sources</option>
       <option value="salesforce">📊 Salesforce</option>
@@ -600,14 +644,20 @@ input.disq-other:focus{border-color:var(--red)}
       <option value="disq">🚫 Disqualified</option>
     </select>
     <div class="bulk-sep"></div>
-    <span class="bulk-lbl">Tag week:</span>
-    <select class="bulk-sel" id="avBulkWeek" onchange="avBulkTag()">
-      <option value="">— Week —</option>
-    </select>
+    <span class="bulk-lbl">Weeks:</span>
+    <div class="bwm-wrap" id="bwmAv">
+      <button class="bulk-sel bwm-btn" type="button" onclick="toggleBwm(event,'bwmAv')">Select weeks ▾</button>
+      <div class="bwm-panel"></div>
+    </div>
     <div class="bulk-sep"></div>
-    <span class="bulk-lbl">Untag week:</span>
-    <select class="bulk-sel" id="avBulkUntagWeek" onchange="avBulkUntag()">
-      <option value="">— Week —</option>
+    <span class="bulk-lbl">Tag plan:</span>
+    <select class="bulk-sel" id="avBulkPlanSel" onchange="avBulkTagPlan()">
+      <option value="">— Plan —</option>
+      <option value="Pricing Plan">💵 Pricing Plan</option>
+      <option value="Direct Plan">💻 Direct Plan</option>
+      <option value="Performance Plan">📈 Performance Plan</option>
+      <option value="Connect AI">🤖 Connect AI</option>
+      <option value="__clear">✕ Clear plan</option>
     </select>
     <div class="bulk-sep"></div>
     <button class="btn btn-sm btn-teal" onclick="avExportIds()">📋 Export IDs</button>
@@ -618,7 +668,7 @@ input.disq-other:focus{border-color:var(--red)}
     <table class="av-table" id="avTable">
       <thead>
         <tr>
-          <th><input type="checkbox" class="av-hdr-cb" id="avSelAll" onchange="avToggleAll(this.checked)"></th>
+          <th class="av-sel-th"><input type="checkbox" class="av-hdr-cb" id="avSelAll" onchange="avToggleAll(this.checked)"><button class="smart-sel-arrow" type="button" onclick="toggleSmartSel(event)" title="Quick select options">▾</button><div class="smart-sel-panel" id="smartSelPanel"><div class="ss-row"><span class="ss-lbl">Select first</span><input type="number" class="ss-inp" id="avSelFirstN" min="1" placeholder="N" onkeydown="if(event.key==='Enter'){avSelectFirst();closeSmartSel();}"><button class="ss-btn" onclick="avSelectFirst();closeSmartSel()">↵</button></div><div class="ss-row"><span class="ss-lbl">Select random</span><input type="number" class="ss-inp" id="avSelRandomN" min="1" placeholder="N" onkeydown="if(event.key==='Enter'){avSelectRandom();closeSmartSel();}"><button class="ss-btn" onclick="avSelectRandom();closeSmartSel()">🎲</button></div></div></th>
           <th onclick="avSort('name')">Account</th>
           <th onclick="avSort('country')">Country</th>
           <th onclick="avSort('city')">City</th>
@@ -630,6 +680,7 @@ input.disq-other:focus{border-color:var(--red)}
           <th onclick="avSort('owner')">Owner</th>
           <th onclick="avSort('contacts')">Contacts</th>
           <th onclick="avSort('stage')">Stage</th>
+          <th onclick="avSort('plan')">Plan</th>
           <th>Week</th>
           <th>Last Note</th>
         </tr>
@@ -895,6 +946,7 @@ input.disq-other:focus{border-color:var(--red)}
       <div class="nurture-reason" data-reason="Not interested" onclick="pickNurtureReason(this)">😐 Not interested</div>
       <div class="nurture-reason" data-reason="Follow up in a few months" onclick="pickNurtureReason(this)">📅 Follow up in a few months</div>
       <div class="nurture-reason" data-reason="Active opp" onclick="pickNurtureReason(this)">🔥 Active opp</div>
+      <div class="nurture-reason" data-reason="Can't reach Decision Maker" onclick="pickNurtureReason(this)">📵 Can't reach Decision Maker</div>
     </div>
     <div class="nurture-acts">
       <button class="btn btn-ghost btn-sm" onclick="cancelNurture()">Cancel</button>
@@ -980,6 +1032,7 @@ const COLS=[
   {key:'nurture',   label:'Nurture',             icon:'🌱',css:'col-nurture',  hint:'Drag here — a reason is required'},
   {key:'disq',      label:'Disqualified',        icon:'🚫',css:'col-disq',     hint:'Drag here — a reason is required'},
 ];
+const PLAN_EMOJI={'Pricing Plan':'💵','Direct Plan':'💻','Performance Plan':'📈','Connect AI':'🤖'};
 
 // ── State ───────────────────────────────────────────────────────────
 function loadS(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch{return{}}}
@@ -1053,6 +1106,7 @@ function getFilters(){return{
   custType:msGet('fCustType'),
   ae:msGet('fAE'),
   contacts:document.getElementById('fContacts').value,
+  batch:msGet('fBatch'),
 };}
 
 function applyFilters(arr,f){return arr.filter(r=>{
@@ -1075,6 +1129,7 @@ function applyFilters(arr,f){return arr.filter(r=>{
     else{if(!specificWeeks.some(w=>tags.includes(w)))return false;}
   }
   if(f.contacts){const ct=getContacts(r.id).length;if(f.contacts==='has'&&ct===0)return false;if(f.contacts==='none'&&ct>0)return false;}
+  if(f.batch&&f.batch.size>0&&!f.batch.has(r.uploadBatch||''))return false;
   return true;
 });}
 
@@ -1151,6 +1206,7 @@ function cardHTML(r){
   if(noteCount>0)badges+=`<span class="badge b-note">📝 ${noteCount}</span>`;
   if(stage==='disq'&&acc.disqReason)badges+=`<span class="badge b-disq" title="${acc.disqReason}">⚠ ${acc.disqReason}</span>`;
   if(stage==='nurture'&&acc.nurtureReason)badges+=`<span class="badge b-week" title="${acc.nurtureReason}">🌱 ${acc.nurtureReason}</span>`;
+  getPlans(r.id).forEach(p=>badges+=`<span class="badge b-plan">${PLAN_EMOJI[p]||'💼'} ${p}</span>`);
 
   return`<div class="card ${bclass}" draggable="${!selectMode}" data-id="${r.id}"
     ondragstart="onDragStart(event,'${r.id}')" ondragend="onDragEnd(event)"
@@ -1197,6 +1253,13 @@ function renderWeekPopContent(id){
     </button>`;
   });
   if(curTags.length)html+=`<button class="wp-remove" onclick="clearAllWeekTags('${id}')">✕ Clear all tags</button>`;
+  const PLANS=[{v:'Pricing Plan',l:'💵 Pricing Plan'},{v:'Direct Plan',l:'💻 Direct Plan'},{v:'Performance Plan',l:'📈 Performance Plan'},{v:'Connect AI',l:'🤖 Connect AI'}];
+  const curPlans=getPlans(id);
+  html+=`<div class="wp-plan-section">
+    <div class="wp-plan-title">💼 Lighthouse Plan</div>
+    <div class="wp-plan-grid">${PLANS.map(p=>`<button class="wp-plan-btn${curPlans.includes(p.v)?' wp-plan-sel':''}" onclick="setPlan('${id}','${p.v}')">${p.l}</button>`).join('')}</div>
+    ${curPlans.length?`<button class="wp-plan-clear" onclick="clearPlan('${id}')">✕ Clear all plans</button>`:''}
+  </div>`;
   pop.innerHTML=html;
 }
 function closeWeekPop(){document.getElementById('weekPop').classList.remove('open');_popId=null;}
@@ -1216,6 +1279,93 @@ function clearAllWeekTags(id){
   saveS(S);renderWeekPopContent(id);render();
   if(curId===id)renderWeekModal(id);
   showToast('All week tags removed');
+}
+function getPlans(id){const s=S[id]||{};if(s.pitchedPlans&&s.pitchedPlans.length)return s.pitchedPlans;if(s.pitchedPlan)return[s.pitchedPlan];return[];}
+function getPlan(id){return getPlans(id).join(', ');}
+function setPlan(id,plan){
+  S[id]=S[id]||{};
+  const plans=new Set(getPlans(id));
+  if(plans.has(plan)){plans.delete(plan);}else{plans.add(plan);}
+  S[id].pitchedPlans=[...plans];delete S[id].pitchedPlan;
+  saveS(S);renderWeekPopContent(id);render();
+}
+function clearPlan(id){
+  if(S[id]){delete S[id].pitchedPlans;delete S[id].pitchedPlan;}
+  saveS(S);renderWeekPopContent(id);render();
+}
+function bulkTagPlan(){
+  const plan=document.getElementById('bulkPlanSel').value;if(!plan)return;
+  SEL.forEach(id=>{S[id]=S[id]||{};if(plan==='__clear'){delete S[id].pitchedPlans;delete S[id].pitchedPlan;}else{const pl=new Set(getPlans(id));pl.add(plan);S[id].pitchedPlans=[...pl];delete S[id].pitchedPlan;}});
+  saveS(S);document.getElementById('bulkPlanSel').value='';render();
+  showToast(plan==='__clear'?'Plan cleared ✓':'Plan tagged: '+plan+' ✓');
+}
+function avBulkTagPlan(){
+  const plan=document.getElementById('avBulkPlanSel').value;if(!plan)return;
+  const cnt=avSelected.size;
+  avSelected.forEach(id=>{S[id]=S[id]||{};if(plan==='__clear'){delete S[id].pitchedPlans;delete S[id].pitchedPlan;}else{const pl=new Set(getPlans(id));pl.add(plan);S[id].pitchedPlans=[...pl];delete S[id].pitchedPlan;}});
+  saveS(S);document.getElementById('avBulkPlanSel').value='';renderAccountsView();
+  showToast(plan==='__clear'?'Plan cleared for '+cnt+' accounts ✓':'Plan tagged for '+cnt+' accounts ✓');
+}
+function toggleBwm(e,wrapId){
+  e.stopPropagation();
+  const wrap=document.getElementById(wrapId);
+  const panel=wrap.querySelector('.bwm-panel');
+  if(!panel)return;
+  document.querySelectorAll('.bwm-panel.open').forEach(p=>{if(p!==panel)p.classList.remove('open');});
+  if(panel.classList.contains('open')){panel.classList.remove('open');return;}
+  const isAv=wrapId==='bwmAv';
+  const ids=isAv?[...avSelected]:[...SEL];
+  let h='';
+  WEEKS.forEach(w=>{
+    const allHave=ids.length>0&&ids.every(id=>getWeekTags(id).includes(w));
+    h+=`<label class="bwm-item"><input type="checkbox" value="${w}"${allHave?' checked':''} onchange="bwmToggleWeek(event,'${wrapId}','${w}')"> ${weekLabel(w)} – ${weekEndLabel(w)}</label>`;
+  });
+  panel.innerHTML=h;
+  panel.addEventListener('click',ev=>ev.stopPropagation());
+  panel.classList.add('open');
+}
+function bwmToggleWeek(e,wrapId,week){
+  const isAv=wrapId==='bwmAv';
+  const ids=isAv?[...avSelected]:[...SEL];
+  if(!ids.length){showToast('No accounts selected');e.target.checked=!e.target.checked;return;}
+  if(e.target.checked){
+    ids.forEach(id=>{S[id]=S[id]||{};const t=new Set(getWeekTags(id));t.add(week);S[id].weekTags=[...t].sort();});
+    showToast('Added '+weekLabel(week)+' to '+ids.length+' accounts ✓');
+  }else{
+    ids.forEach(id=>{if(!S[id])return;const t=new Set(getWeekTags(id));t.delete(week);S[id].weekTags=[...t].sort();});
+    showToast('Removed '+weekLabel(week)+' from '+ids.length+' accounts ✓');
+  }
+  saveS(S);
+  if(isAv)renderAccountsView();else render();
+}
+function toggleSmartSel(e){
+  e.stopPropagation();
+  const panel=document.getElementById('smartSelPanel');
+  if(!panel)return;
+  panel.classList.toggle('open');
+}
+function closeSmartSel(){
+  const panel=document.getElementById('smartSelPanel');
+  if(panel)panel.classList.remove('open');
+}
+function avSelectFirst(){
+  const n=parseInt(document.getElementById('avSelFirstN').value)||0;
+  if(n<=0)return;
+  const rows=getAvFiltered();
+  avSelected.clear();
+  rows.slice(0,n).forEach(r=>avSelected.add(r.id));
+  updateAvBulkBar();renderAccountsView();
+  showToast('Selected first '+Math.min(n,rows.length)+' accounts ✓');
+}
+function avSelectRandom(){
+  const n=parseInt(document.getElementById('avSelRandomN').value)||0;
+  if(n<=0)return;
+  const rows=[...getAvFiltered()];
+  for(let i=rows.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[rows[i],rows[j]]=[rows[j],rows[i]];}
+  avSelected.clear();
+  rows.slice(0,n).forEach(r=>avSelected.add(r.id));
+  updateAvBulkBar();renderAccountsView();
+  showToast('Randomly selected '+Math.min(n,rows.length)+' accounts ✓');
 }
 
 // ── KPIs ─────────────────────────────────────────────────────────────
@@ -2133,6 +2283,7 @@ function populateAvFilters(){
   // Batch (dynamic — upload wave tracking)
   const batches=[...(new Set(ALL.map(r=>r.uploadBatch).filter(Boolean)))].sort();
   msInit('avBatch',batches.map(b=>({value:b,label:'📦 '+b})),'All batches');
+  msInit('avPlan',[{value:'Pricing Plan',label:'💵 Pricing Plan'},{value:'Direct Plan',label:'💻 Direct Plan'},{value:'Performance Plan',label:'📈 Performance Plan'},{value:'Connect AI',label:'🤖 Connect AI'}],'All plans',renderAccountsView);
   // Bulk week selects (unchanged native selects)
   const bw=document.getElementById('avBulkWeek');
   if(bw&&bw.options.length<=1){
@@ -2147,7 +2298,7 @@ function avSort(col){
   if(avSortCol===col)avSortDir*=-1;
   else{avSortCol=col;avSortDir=1;}
   document.querySelectorAll('.av-table th').forEach(th=>{th.classList.remove('sort-asc','sort-desc');});
-  const headers={name:1,country:2,city:3,type:4,custType:5,stars:6,rooms:7,baseRate:8,owner:9,contacts:10,stage:11};
+  const headers={name:1,country:2,city:3,type:4,custType:5,stars:6,rooms:7,baseRate:8,owner:9,contacts:10,stage:11,plan:12};
   const idx=headers[col];
   if(idx!==undefined){
     const ths=document.querySelectorAll('.av-table th');
@@ -2195,6 +2346,7 @@ function getAvFiltered(){
     }
     const _stars=msGet('avStars');if(_stars.size>0&&!_stars.has(String(parseInt(r.stars)||0)))return false;
     const _batch=msGet('avBatch');if(_batch.size>0&&!_batch.has(r.uploadBatch||''))return false;
+    const _plan=msGet('avPlan');if(_plan.size>0&&!getPlans(r.id).some(p=>_plan.has(p)))return false;
     if(roomsOp&&!isNaN(roomsVal)){
       const rv=r.rooms||0;
       if(roomsOp==='eq'&&rv!==roomsVal)return false;
@@ -2224,6 +2376,7 @@ function getAvFiltered(){
     else if(avSortCol==='owner'){va=(a.owner||'').toLowerCase();vb=(b.owner||'').toLowerCase();}
     else if(avSortCol==='contacts'){va=getContacts(a.id).length;vb=getContacts(b.id).length;}
     else if(avSortCol==='stage'){va=stagePriority[getStage(a)]??9;vb=stagePriority[getStage(b)]??9;}
+    else if(avSortCol==='plan'){va=getPlans(a.id).join(',').toLowerCase();vb=getPlans(b.id).join(',').toLowerCase();}
     else{va=a.name.toLowerCase();vb=b.name.toLowerCase();}
     if(va<vb)return -1*avSortDir;if(va>vb)return 1*avSortDir;return 0;
   });
@@ -2278,7 +2431,7 @@ function renderAccountsView(){
   const STAGE_LABEL={untouched:'Untouched',chase:'Still need to chase',email:'Email sent',demo:'Demo booked',nurture:'Nurture',disq:'Disqualified'};
   const STAGE_CLS={untouched:'av-stage-untouched',chase:'av-stage-chase',email:'av-stage-email',demo:'av-stage-demo',nurture:'av-stage-nurture',disq:'av-stage-disq'};
   const tbody=document.getElementById('avTableBody');
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="13" class="av-empty">No accounts match the current filters.</td></tr>`;return;}
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="15" class="av-empty">No accounts match the current filters.</td></tr>`;return;}
   tbody.innerHTML=rows.map(r=>{
     const stage=getStage(r);
     const stageLbl=STAGE_LABEL[stage]||stage;
@@ -2305,6 +2458,7 @@ function renderAccountsView(){
       <td class="av-muted">${r.owner||'—'}</td>
       <td>${ct?`<span class="av-contacts-pill">👤 ${ct}</span>`:'<span class="av-muted">—</span>'}</td>
       <td><span class="av-badge ${stageCls}">${stageLbl}</span></td>
+      <td>${getPlans(r.id).length?getPlans(r.id).map(p=>`<span class="av-badge b-plan">${PLAN_EMOJI[p]||'💼'} ${p}</span>`).join(' '):'<span class="av-muted">—</span>'}</td>
       <td>${weekTagsRow.length>1?`<div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${weekTagsRow.map(w=>`<span class="av-week">${weekLabel(w)}</span>`).join('')}<span style="font-size:9px;color:var(--muted);font-weight:600;margin-left:2px">(${weekTagsRow.length})</span></div>`:weekTagsRow.length===1?`<span class="av-week">${weekLabel(weekTagsRow[0])}</span>`:'<span class="av-muted">—</span>'}</td>
       <td><div class="av-note-preview" title="${lastNote}">${lastNote||'<span class="av-muted">—</span>'}</div></td>
     </tr>`;
@@ -2334,9 +2488,8 @@ function updateAvBulkBar(){
   document.getElementById('avBulkCnt').textContent=cnt+' selected';
   bar.classList.toggle('open',cnt>0);
   document.getElementById('avBulkStage').value='';
-  document.getElementById('avBulkWeek').value='';
-  const untagSel=document.getElementById('avBulkUntagWeek');
-  if(untagSel)untagSel.value='';
+  const planSel=document.getElementById('avBulkPlanSel');
+  if(planSel)planSel.value='';
 }
 function avClearSel(){avSelected.clear();updateAvBulkBar();renderAccountsView();}
 function avBulkMove(){
@@ -2419,8 +2572,8 @@ function avExportCustomIds(){
   document.body.removeChild(el);
 }
 function clearAvFilters(){
-  ['avStage','avWeek','avCountry','avCity','avType','avCustType','avOwner','avStars','avBatch'].forEach(id=>{
-    msClear(id,{avStage:'All stages',avWeek:'All weeks',avCountry:'All countries',avType:'All types',avCustType:'All customer types',avOwner:'All owners',avStars:'All stars'}[id]);
+  ['avStage','avWeek','avCountry','avCity','avType','avCustType','avOwner','avStars','avBatch','avPlan'].forEach(id=>{
+    msClear(id,{avStage:'All stages',avWeek:'All weeks',avCountry:'All countries',avType:'All types',avCustType:'All customer types',avOwner:'All owners',avStars:'All stars',avBatch:'All batches',avPlan:'All plans'}[id]);
   });
   ['avSearch','avSource','avContacts','avRoomsOp','avRoomsVal','avBaseRateOp','avBaseRateVal'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
@@ -2702,8 +2855,8 @@ function confirmReset(){
   saveS(S);render();showToast('Stages + tags reset ✓');
 }
 function clearFilters(){
-  ['fWeek','fCountry','fType','fStars','fCustType','fAE'].forEach(id=>{
-    msClear(id,{fWeek:'All weeks',fCountry:'All countries',fType:'All types',fStars:'All stars',fCustType:'All customer types',fAE:'All AEs'}[id]);
+  ['fWeek','fCountry','fType','fStars','fCustType','fAE','fBatch'].forEach(id=>{
+    msClear(id,{fWeek:'All weeks',fCountry:'All countries',fType:'All types',fStars:'All stars',fCustType:'All customer types',fAE:'All AEs',fBatch:'All batches'}[id]);
   });
   document.getElementById('search').value='';
   const fc=document.getElementById('fContacts');if(fc)fc.value='';
@@ -2751,6 +2904,9 @@ function copyText(t){if(navigator.clipboard&&navigator.clipboard.writeText){navi
 document.addEventListener('click',e=>{
   const pop=document.getElementById('weekPop');
   if(pop.classList.contains('open')&&!pop.contains(e.target))closeWeekPop();
+  document.querySelectorAll('.bwm-panel.open').forEach(p=>p.classList.remove('open'));
+  const ssp=document.getElementById('smartSelPanel');
+  if(ssp&&ssp.classList.contains('open')&&!ssp.closest('th').contains(e.target))ssp.classList.remove('open');
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cancelDisq();cancelNurture();closeWeekPop();}});
 
@@ -2766,14 +2922,12 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cance
   msInit('fCustType',[{value:'Independent',label:'Independent'},{value:'Group',label:'Group'},{value:'Global Chain',label:'Global Chain'},{value:'Local Chain',label:'Local Chain'},{value:'Business',label:'Business'}],'All customer types',render);
   // Week filter for board (built from WEEKS array)
   const weekOpts=[{value:'untagged',label:'📭 Untagged only'}];
-  const bwSel=document.getElementById('bulkWeek');
   WEEKS.forEach(w=>{
     weekOpts.push({value:w,label:'📅 '+weekLabel(w)+' – '+weekEndLabel(w)});
-    const o2=document.createElement('option');
-    o2.value=w;o2.textContent='📅 '+weekLabel(w)+' – '+weekEndLabel(w);
-    bwSel.appendChild(o2);
   });
   msInit('fWeek',weekOpts,'All weeks',render);
+  const fBatches=[...new Set(ALL.map(r=>r.uploadBatch).filter(Boolean))].sort();
+  msInit('fBatch',fBatches.map(b=>({value:b,label:'📦 '+b})),'All batches',render);
   // Load and merge custom accounts from localStorage
   const customAccounts=loadCustomAccounts();
   if(customAccounts.length>0){
