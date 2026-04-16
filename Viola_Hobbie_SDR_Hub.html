@@ -505,7 +505,7 @@ input.disq-other:focus{border-color:var(--red)}
     </div>
     <div style="width:1px;height:20px;background:rgba(255,255,255,.30)"></div>
     <button class="btn btn-ghost btn-sm" onclick="openAddAccountForm()" title="Add a new account manually">➕ Add Account</button>
-    <button class="btn btn-ghost btn-sm" onclick="importBackup()" title="Restore notes, tags and stages from a backup file">📂 Import</button>
+    <button class="btn btn-ghost btn-sm" onclick="importBackup()" title="Import a backup or plan patch file">📂 Import</button>
     <button class="btn btn-ghost btn-sm" onclick="exportBackup()" title="Save all notes, tags and stages to a file">💾 Export</button>
     <button class="btn btn-ghost btn-sm" onclick="confirmReset()">↺ Reset</button>
   </div>
@@ -2883,12 +2883,22 @@ function importBackup(){
     reader.onload=ev=>{
       try{
         const data=JSON.parse(ev.target.result);
-        const state=data.state||data;
-        if(typeof state!=='object'||Array.isArray(state))throw new Error('bad format');
-        if(!confirm('This will replace your current notes, tags and stages with the backup. Continue?'))return;
-        S=state;saveS(S);render();
-        showToast('Backup restored ✓  ('+Object.keys(S).length+' accounts loaded)');
-      }catch(err){showToast('⚠️ Could not read backup — make sure it\'s a valid SDR Hub backup file');}
+        if(data.type==='plan_patch'&&typeof data.plans==='object'){
+          let updated=0,skipped=0;
+          Object.entries(data.plans).forEach(([id,plans])=>{
+            if(getPlans(id).length===0){S[id]=S[id]||{};S[id].pitchedPlans=plans;updated++;}
+            else{skipped++;}
+          });
+          saveS(S);render();
+          showToast('Plans imported: '+updated+' tagged, '+skipped+' already set (skipped) ✓');
+        }else{
+          const state=data.state||data;
+          if(typeof state!=='object'||Array.isArray(state))throw new Error('bad format');
+          if(!confirm('This will replace your current notes, tags and stages with the backup. Continue?'))return;
+          S=state;saveS(S);render();
+          showToast('Backup restored ✓  ('+Object.keys(S).length+' accounts loaded)');
+        }
+      }catch(err){showToast('⚠️ Could not read file — make sure it\'s a valid SDR Hub backup or plan patch file');}
     };
     reader.readAsText(file);
   };
