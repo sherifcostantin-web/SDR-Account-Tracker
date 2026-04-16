@@ -527,6 +527,7 @@ input.disq-other:focus{border-color:var(--red)}
   <div class="ms-wrap" id="fCustType"></div>
   <div class="ms-wrap" id="fAE"></div>
   <div class="ms-wrap" id="fBatch"></div>
+  <div class="ms-wrap" id="fPlan"></div>
   <select class="flt" id="fContacts" onchange="render()">
     <option value="">All contacts</option>
     <option value="has">👤 Has contacts</option>
@@ -1107,6 +1108,7 @@ function getFilters(){return{
   ae:msGet('fAE'),
   contacts:document.getElementById('fContacts').value,
   batch:msGet('fBatch'),
+  plan:msGet('fPlan'),
 };}
 
 function applyFilters(arr,f){return arr.filter(r=>{
@@ -1130,6 +1132,7 @@ function applyFilters(arr,f){return arr.filter(r=>{
   }
   if(f.contacts){const ct=getContacts(r.id).length;if(f.contacts==='has'&&ct===0)return false;if(f.contacts==='none'&&ct>0)return false;}
   if(f.batch&&f.batch.size>0&&!f.batch.has(r.uploadBatch||''))return false;
+  if(f.plan&&f.plan.size>0&&!getPlans(r.id).some(p=>f.plan.has(p)))return false;
   return true;
 });}
 
@@ -2855,8 +2858,8 @@ function confirmReset(){
   saveS(S);render();showToast('Stages + tags reset ✓');
 }
 function clearFilters(){
-  ['fWeek','fCountry','fType','fStars','fCustType','fAE','fBatch'].forEach(id=>{
-    msClear(id,{fWeek:'All weeks',fCountry:'All countries',fType:'All types',fStars:'All stars',fCustType:'All customer types',fAE:'All AEs',fBatch:'All batches'}[id]);
+  ['fWeek','fCountry','fType','fStars','fCustType','fAE','fBatch','fPlan'].forEach(id=>{
+    msClear(id,{fWeek:'All weeks',fCountry:'All countries',fType:'All types',fStars:'All stars',fCustType:'All customer types',fAE:'All AEs',fBatch:'All batches',fPlan:'All plans'}[id]);
   });
   document.getElementById('search').value='';
   const fc=document.getElementById('fContacts');if(fc)fc.value='';
@@ -2939,6 +2942,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cance
   msInit('fWeek',weekOpts,'All weeks',render);
   const fBatches=[...new Set(ALL.map(r=>r.uploadBatch).filter(Boolean))].sort();
   msInit('fBatch',fBatches.map(b=>({value:b,label:'📦 '+b})),'All batches',render);
+  msInit('fPlan',[{value:'Pricing Plan',label:'💵 Pricing Plan'},{value:'Direct Plan',label:'💻 Direct Plan'},{value:'Performance Plan',label:'📈 Performance Plan'},{value:'Connect AI',label:'🤖 Connect AI'}],'All plans',render);
   // Load and merge custom accounts from localStorage
   const customAccounts=loadCustomAccounts();
   if(customAccounts.length>0){
