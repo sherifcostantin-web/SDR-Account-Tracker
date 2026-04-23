@@ -891,7 +891,7 @@ input.disq-other:focus{border-color:var(--red)}
   <div class="modal">
     <div class="modal-head">
       <div><div class="modal-title" id="mTitle"></div><div class="modal-meta" id="mMeta"></div></div>
-      <button class="modal-x" onclick="closeDetail()">✕</button>
+      <button id="mDeleteBtn" style="display:none;background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px" onclick="deleteCustomAccount()">🗑 Delete</button><button class="modal-x" onclick="closeDetail()">✕</button>
     </div>
     <div class="modal-tabs">
       <button class="modal-tab active" id="mtab-details" onclick="switchModalTab('details')">🏨 Details</button>
@@ -1622,7 +1622,7 @@ function saveNewAccount(){
     stars:0,
     rooms:0,
     accType:'',
-    owner:'Valeria Orozco',
+    owner:'',
     lastActivity:null,
     pms:'',
     rms:'',
@@ -1745,6 +1745,9 @@ function openDetail(id){
   
   // Title with custom badge
   document.getElementById('mTitle').textContent=r.name;
+  // Show delete button only for custom accounts
+  const delBtn=document.getElementById('mDeleteBtn');
+  if(delBtn)delBtn.style.display=isCustom?'inline-block':'none';
   if(isCustom){
     document.getElementById('mTitle').innerHTML=r.name+' <span style="font-size:10px;background:var(--purple-bg);color:var(--purple-text);padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:600">✏️ CUSTOM</span>';
   }
@@ -1868,6 +1871,22 @@ function stageFromModal(col){
   else{applyStage(curId,col);openDetail(curId);}
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');curId=null;}
+function deleteCustomAccount(){
+  const r=ALL.find(x=>x.id===curId);
+  if(!r||!r.isCustom){showToast('Only custom accounts can be deleted');return;}
+  if(!confirm('Delete "'+r.name+'"? This cannot be undone.'))return;
+  // Remove from ALL
+  const idx=ALL.findIndex(x=>x.id===curId);
+  if(idx>-1)ALL.splice(idx,1);
+  // Remove from customAccounts in localStorage
+  let custom=loadCustomAccounts().filter(x=>x.id!==curId);
+  saveCustomAccounts(custom);
+  // Remove any saved state for this account
+  if(S[curId]){delete S[curId];saveS(S);}
+  closeDetail();
+  render();
+  showToast('Account deleted ✓');
+}
 function maybeClose(e){if(e.target===document.getElementById('detailOverlay'))closeDetail();}
 
 // ── Edit Custom Account Fields ────────────────────────────────────────
