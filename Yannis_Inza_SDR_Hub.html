@@ -1815,9 +1815,8 @@ function renderWeekModal(id){
   document.getElementById('mWeekRow').innerHTML=WEEKS.map(w=>{
     const cnt=getWeekTagCount(w);
     const isSel=curTags.includes(w);
-    const isFull=cnt>=MAX_WEEK&&!isSel;
     const countHint=cnt>0?` <span style="font-size:10px;opacity:.65">(${cnt})</span>`:'';
-    return`<button class="wt-btn${isSel?' sel':''}" onclick="setWeekTagModal('${id}','${w}')" ${isFull?'disabled title="Week full"':''}>
+    return`<button class="wt-btn${isSel?' sel':''}" onclick="setWeekTagModal('${id}','${w}')">
       📅 ${weekLabel(w)}${countHint}
     </button>`;
   }).join('')+(curTags.length?`<button class="wt-remove" onclick="clearAllWeekTagsModal('${id}')">✕ Clear all</button>`:'');
