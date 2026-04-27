@@ -1685,8 +1685,7 @@ function startEditField(id,field){
 const PLAN_OPTIONS=['Connect AI','Direct Plan','Pricing Plan','Performance Plan'];
 
 function renderPlanChips(id){
-  const acc=S[id]||{};
-  const plans=acc.plans||[];
+  const plans=getPlans(id);
   document.getElementById('mPlanChips').innerHTML=PLAN_OPTIONS.map(p=>{
     const active=plans.includes(p);
     return`<button class="plan-chip${active?' active':''}" onclick="togglePlan('${id}','${p}')">${active?'✓ ':''} ${p}</button>`;
@@ -1695,13 +1694,14 @@ function renderPlanChips(id){
 
 function togglePlan(id,plan){
   S[id]=S[id]||{};
-  let plans=S[id].plans||[];
-  if(plans.includes(plan)){plans=plans.filter(p=>p!==plan);}else{plans=[...plans,plan];}
-  S[id].plans=plans;
+  const plans=new Set(getPlans(id));
+  if(plans.has(plan)){plans.delete(plan);}else{plans.add(plan);}
+  S[id].pitchedPlans=[...plans];delete S[id].pitchedPlan;delete S[id].plans;
   saveS(S);
   renderPlanChips(id);
+  render();
   renderAccountsView();
-  showToast(plans.includes(plan)?`Plan set: ${plan}`:`Plan removed: ${plan}`);
+  showToast(plans.has(plan)?`Plan set: ${plan}`:`Plan removed: ${plan}`);
 }
 
 function renderClHistory(id){
