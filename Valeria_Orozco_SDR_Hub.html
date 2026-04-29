@@ -3242,6 +3242,21 @@ function exportBackup(){
   URL.revokeObjectURL(a.href);
   showToast('Backup exported ✓  ('+Object.keys(S).length+' accounts saved)');
 }
+// ── Auto-export (daily backup) ───────────────────────────────────────
+const AUTO_EXPORT_KEY='sdr_hub_auto_export_ts';
+function autoExportIfDue(){
+  const last=parseInt(localStorage.getItem(AUTO_EXPORT_KEY)||'0',10);
+  if(Date.now()-last<86400000)return;
+  if(Object.keys(S).length===0)return;
+  const payload={version:LS,exported:new Date().toISOString(),sdr:'Valeria Orozco',state:S};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='sdr_hub_auto_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  localStorage.setItem(AUTO_EXPORT_KEY,Date.now().toString());
+  showToast('🔄 Auto-backup saved to your Downloads ✓');
+}
 function importBackup(){
   const input=document.createElement('input');
   input.type='file';input.accept='.json';
@@ -3328,6 +3343,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();cance
     console.log('Loaded '+customAccounts.length+' custom account(s) from localStorage');
   }
   render();
+  setTimeout(autoExportIfDue,2000);
+  setInterval(autoExportIfDue,3600000);
 })();
 </script>
 <div id="bulkConfirmOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;align-items:center;justify-content:center">
