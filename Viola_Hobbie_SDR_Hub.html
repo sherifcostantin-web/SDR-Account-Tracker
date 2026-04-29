@@ -3300,6 +3300,20 @@ function importBackup(){
           });
           saveS(S);render();
           showToast('History imported: '+stagesSet+' stages, '+notesAdded+' notes, '+tasksAdded+' tasks, '+contactsAdded+' contacts ✓');
+        }else if(data.type==='field_patch'&&typeof data.accounts==='object'){
+          const ALLOWED=['pms','bookingEngine'];
+          let updated=0,skipped=0;
+          Object.entries(data.accounts).forEach(([id,fields])=>{
+            if(!ALL.find(r=>r.id===id)){skipped++;return;}
+            S[id]=S[id]||{};
+            ALLOWED.forEach(field=>{
+              if(fields[field]!==undefined&&fields[field]!==''){
+                S[id][field]=fields[field];updated++;
+              }
+            });
+          });
+          saveS(S);render();renderAccountsView();
+          showToast('Fields updated: '+updated+' values applied, '+skipped+' unknown accounts skipped ✓');
         }else{
           const state=data.state||data;
           if(typeof state!=='object'||Array.isArray(state))throw new Error('bad format');
